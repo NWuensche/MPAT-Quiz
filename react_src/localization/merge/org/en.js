@@ -355,6 +355,20 @@ const en = {
     ttAutostart: 'Play audio on page load when the page loads',
     ttRepeat: 'Loop/Repeat audio'
   },
+  quiz: {
+    title: 'Quiz settings',
+    audioUrlInput: 'Source File',
+    audioUrlLabel: 'Source File',
+    autoStart: 'Auto Start',
+    chooseFile: 'Choose file',
+    whenPageLoads: 'When the page loads',
+    repeat: 'Repeat',
+    loop: 'Loop',
+    ttAudioUrl: 'Load audio from URL',
+    ttChooseFile: 'Select audio from disc or library',
+    ttAutostart: 'Play audio on page load when the page loads',
+    ttRepeat: 'Loop/Repeat audio'
+  },
   broadcast: {
     notice1: 'The broadcast component displays the broadcast signal on the TV.',
     notice2: 'If you are testing this component on your desktop using',

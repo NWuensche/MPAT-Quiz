@@ -114,6 +114,7 @@ const backendConfig = createConfig({
       './backend/components/contenttypes/Text.jsx',
       './backend/components/contenttypes/ToggleTracking.jsx',
       './backend/components/contenttypes/Video.jsx',
+      './backend/components/contenttypes/Quiz.jsx',
       './backend/admin.jsx'
     ],
     mpat_app_manager: [
