@@ -26,7 +26,7 @@
 var webpack = require('webpack');
 var path = require('path');
 var stage = process.env.NODE_ENV || 'dev';
-var GitRevisionPlugin = require('git-revision-webpack-plugin');
+// var GitRevisionPlugin = require('git-revision-webpack-plugin');
 //var ES5to3OutputPlugin = require('es5to3-webpack-plugin');
 
 let getPlugins = (stage) => {
@@ -58,7 +58,7 @@ let getPlugins = (stage) => {
     )
   }
 
-  plugins.push(new GitRevisionPlugin({ versionCommand: 'describe --always --tags' }));
+  // plugins.push(new GitRevisionPlugin({ versionCommand: 'describe --always --tags' }));
   return plugins;
 };
 

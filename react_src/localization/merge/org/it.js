@@ -280,6 +280,12 @@ const it = {
     repeat: 'Repeat',
     loop: 'Loop'
   },
+  quiz: {
+    title: 'Quiz settings',
+    audioUrlInput: 'Source File',
+    audioUrlLabel: 'Source File',
+    chooseFile: 'Choose file',
+  },
   broadcast: {
     notice1: 'The broadcast component displays the broadcast signal on the TV.',
     notice2: 'If you are testing this component on your desktop using',
