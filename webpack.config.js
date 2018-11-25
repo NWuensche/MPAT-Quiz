@@ -136,6 +136,7 @@ const backendConfig = createConfig({
       './backend/components/contenttypes/Text.jsx',
       './backend/components/contenttypes/ToggleTracking.jsx',
       './backend/components/contenttypes/Video.jsx',
+      './backend/components/contenttypes/Quiz.jsx',
       './app_manager/app_manager.jsx'
     ],
     mpat_timeline: './backend/timeline/timeline_main.jsx',
@@ -165,6 +166,7 @@ const frontendConfig = createConfig({
       './frontend/components/contenttypes/ToggleTrackingContent.jsx',
       './frontend/components/contenttypes/ScribbleLive.jsx',
       './frontend/components/contenttypes/ScrolledTextContent.jsx',
+      './frontend/components/contenttypes/QuizContent.jsx',
       './frontend/core.jsx'
     ]
   },
