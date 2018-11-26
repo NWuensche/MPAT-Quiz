@@ -115,6 +115,7 @@ const backendConfig = createConfig({
       './backend/components/contenttypes/ToggleTracking.jsx',
       './backend/components/contenttypes/Video.jsx',
       './backend/components/contenttypes/Quiz.jsx',
+      './backend/components/contenttypes/QuizScore.jsx',
       './backend/admin.jsx'
     ],
     mpat_app_manager: [
@@ -137,6 +138,7 @@ const backendConfig = createConfig({
       './backend/components/contenttypes/ToggleTracking.jsx',
       './backend/components/contenttypes/Video.jsx',
       './backend/components/contenttypes/Quiz.jsx',
+      './backend/components/contenttypes/QuizScore.jsx',
       './app_manager/app_manager.jsx'
     ],
     mpat_timeline: './backend/timeline/timeline_main.jsx',
@@ -167,6 +169,7 @@ const frontendConfig = createConfig({
       './frontend/components/contenttypes/ScribbleLive.jsx',
       './frontend/components/contenttypes/ScrolledTextContent.jsx',
       './frontend/components/contenttypes/QuizContent.jsx',
+      './frontend/components/contenttypes/QuizScoreContent.jsx',
       './frontend/core.jsx'
     ]
   },
