@@ -25,19 +25,21 @@
  * Marco Ferrari (marco.ferrari@finconsgroup.com)
  *
  **/
-import React, {PropTypes as Types} from 'react';
+import React, { PropTypes as Types } from 'react';
 import autobind from 'class-autobind';
-import {componentLoader} from '../../../ComponentLoader';
-import {noSubmitOnEnter} from '../../utils';
-import {getTooltipped} from '../../tooltipper';
+import { componentLoader } from '../../../ComponentLoader';
+import { noSubmitOnEnter } from '../../utils';
+import { getTooltipped } from '../../tooltipper';
 import Constants from '../../../constants';
+import { generateId } from '../../../functions';
+
 
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const {id, data, changeAreaContent, getComponentStates} = params;
+  const { id, changeAreaContent } = params;
   return (
-    <QuizEdit id={id} {...data} changeAreaContent={changeAreaContent}/>
+    <Quiz id={id} changeAreaContent={changeAreaContent} />
   );
 }
 
@@ -54,23 +56,23 @@ function sharedProps() {
   return {
     // updateItem: this.updateItem,
     remoteKeys: [
-      {key: '', label: 'Select Remote Button'},
-      {key: 'VK_0', label: '0', disabled: false},
-      {key: 'VK_1', label: '1', disabled: false},
-      {key: 'VK_2', label: '2', disabled: false},
-      {key: 'VK_3', label: '3', disabled: false},
-      {key: 'VK_4', label: '4', disabled: false},
-      {key: 'VK_5', label: '5', disabled: false},
-      {key: 'VK_6', label: '6', disabled: false},
-      {key: 'VK_7', label: '7', disabled: false},
-      {key: 'VK_8', label: '8', disabled: false},
-      {key: 'VK_9', label: '9', disabled: false},
-      {key: 'VK_RED', label: 'red', disabled: false},
-      {key: 'VK_YELLOW', label: 'yellow', disabled: false},
-      {key: 'VK_GREEN', label: 'green', disabled: false},
-      {key: 'VK_BLUE', label: 'blue', disabled: false},
-      {key: 'VK_BACK', label: 'back', disabled: false},
-      {key: 'VK_OK', label: 'ok', disabled: false}
+      { key: '', label: 'Select Remote Button' },
+      { key: 'VK_0', label: '0', disabled: false },
+      { key: 'VK_1', label: '1', disabled: false },
+      { key: 'VK_2', label: '2', disabled: false },
+      { key: 'VK_3', label: '3', disabled: false },
+      { key: 'VK_4', label: '4', disabled: false },
+      { key: 'VK_5', label: '5', disabled: false },
+      { key: 'VK_6', label: '6', disabled: false },
+      { key: 'VK_7', label: '7', disabled: false },
+      { key: 'VK_8', label: '8', disabled: false },
+      { key: 'VK_9', label: '9', disabled: false },
+      { key: 'VK_RED', label: 'red', disabled: false },
+      { key: 'VK_YELLOW', label: 'yellow', disabled: false },
+      { key: 'VK_GREEN', label: 'green', disabled: false },
+      { key: 'VK_BLUE', label: 'blue', disabled: false },
+      { key: 'VK_BACK', label: 'back', disabled: false },
+      { key: 'VK_OK', label: 'ok', disabled: false }
     ]
   };
 }
@@ -83,176 +85,357 @@ const itemType = Types.shape(
     correct: Types.bool
   });
 
+//
+// class QuizEdit extends React.PureComponent {
+//
+//   static get propTypes() {
+//     return {
+//       question_id: Types.string,
+//       answer_options: Types.arrayOf(itemType),
+//       changeAreaContent: Types.func.isRequired
+//     }
+//   };
+//
+//   static get defaultProps() {
+//     return {
+//       question_id: '99',
+//       answer_options: []
+//     }
+//   };
+//
+//   constructor(props) {
+//     super(props);
+//     // autobind(this);
+//     this.state = {numChildren: 0};
+//   }
+//
+//   onAddChild() {
+//     this.setState({
+//       numChildren: this.state.numChildren + 1
+//     });
+//   }
+//
+//   setContent(key, value) {
+//     this.setState({[key]: value});
+//     this.props.changeAreaContent({ listArray });
+//     console.log(this.state.question_id)
+//   }
+//
+//   // setContent(key, value, itemId = false) {
+//   //   if (itemId) {
+//   //     const { answer_options } = this.props;
+//   //     answer_options[key] = value;
+//   //     this.props.changeAreaContent({ answer_options });
+//   //   }
+//   // }
+//
+//   // setPageCallbackFunction(itemId, selectedPage) {
+//   //   if (this.props.listArray.find(d => d.id === itemId).descriptionEdited) {
+//   //     this.updateItem(
+//   //       {
+//   //         appUrl: selectedPage.url,
+//   //         id: itemId
+//   //       });
+//   //   } else {
+//   //     this.updateItem(
+//   //       {
+//   //         appUrl: selectedPage.url,
+//   //         description: selectedPage.title,
+//   //         id: itemId
+//   //       });
+//   //   }
+//   // }
+//
+//   // addItem() {
+//   //   const {answer_options} = this.props;
+//   //   const newOption = createDefaultItem();
+//   //   answer_options.push(newOption);
+//   //   this.props.changeAreaContent({answer_options});
+//   // }
+//   //
+//   // deleteItem(itemId) {
+//   //   let {listArray} = this.props;
+//   //   const idx = listArray.findIndex(({id}) => id === itemId);
+//   //   listArray = listArray.concat();
+//   //   listArray.splice(idx, 1);
+//   //   this.props.changeAreaContent({listArray});
+//   // }
+//
+//   /* guess this just updates the state of the currently dragged item*/
+//
+//
+//   // updateItem(item) {
+//   //   const listArray = [...this.props.listArray];
+//   //   const idx = listArray.findIndex(curItem => item.id === curItem.id);
+//   //   listArray[idx] = Object.assign({}, listArray[idx], item);
+//   //   this.props.changeAreaContent({listArray});
+//   // }
+//
+//
+//   render() {
+//     const children = [];
+//
+//     for (let i = 0; i < this.state.numChildren; i += 1) {
+//       children.push(<ChildComponent key={i} number={i}/>);
+//     }
+//
+//     return (
+//       <ParentComponent addChild={this.onAddChild.bind(this)}>
+//         {children}
+//       </ParentComponent>
+//       // <Preview></Preview>
+//     );
+//   }
+// }
+//
+//
+//
+//
+// const ParentComponent = props => (
+//   <div className="component editHeader">
+//     <h2>Quiz Settings</h2>
+//     <p>
+//       Question Id: <input type="text" value={props.question_id} onChange={e => this.setContent('question_id', e.target.value)}/>
+//       <button onClick={props.addChild} onKeyPress={noSubmitOnEnter}>Add answer option</button>
+//     </p>
+//
+//     <div id="children-pane">
+//       {props.children}
+//     </div>
+//   </div>
+// );
+// const ChildComponent = props => (
+//   <div>
+//     <p>Answer Option:
+//       <input
+//         type="text"
+//         // type="text" value={props.children.label}
+//         // onChange={e => childProps.setContent(props.children.id, 'label', e.target.value)}
+//       />
+//       <input type="radio" id="" name="question_xx" value="x"/>
+//       Remote Key<select id="" name="question_xx" value="x">
+//         {sharedProps().remoteKeys.map(i => (<option value={i.key}>{i.label}</option>))}
+//       </select>
+//       {/* {getTooltipped(*/}
+//       {/* <button*/}
+//       {/* type="button"*/}
+//       {/* className="right white_blue button img_left"*/}
+//       {/* // style={{ position: 'absolute', right: 10, bottom: 10 }}*/}
+//       {/* // onClick={() => childProps.deleteItem(props.children.id)}*/}
+//       {/* >*/}
+//       {/* <svg*/}
+//       {/* id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"*/}
+//       {/* viewBox="0 0 100 100"*/}
+//       {/* >*/}
+//       {/* <path*/}
+//       {/* className="cls-1"*/}
+//       {/* d="M68.26,31.71h-35a1.78,1.78,0,0,0-1.78,1.94l3.78,44.48A1.78,1.78,0,0,0,37,79.76H64.49a1.78,1.78,0,0,0,1.78-1.63L70,33.65a1.78,1.78,0,0,0-1.78-1.94ZM62.85,76.19H38.64L35.17,35.28H66.32Z"*/}
+//       {/* />*/}
+//       {/* <path*/}
+//       {/* className="cls-1"*/}
+//       {/* d="M69.17,26.34H52.53V24.23a1.78,1.78,0,0,0-3.57,0v2.11H32.32a1.78,1.78,0,0,0,0,3.57H69.17a1.78,1.78,0,1,0,0-3.57Z"*/}
+//       {/* />*/}
+//       {/* <path*/}
+//       {/* className="cls-1"*/}
+//       {/* d="M41.31,72a1.78,1.78,0,0,0,1.78,1.63h.16a1.78,1.78,0,0,0,1.62-1.93L42.18,40.53a1.78,1.78,0,0,0-3.56.31Z"*/}
+//       {/* />*/}
+//       {/* <path*/}
+//       {/* className="cls-1"*/}
+//       {/* d="M58.24,73.67h.16A1.78,1.78,0,0,0,60.17,72l2.68-31.22a1.78,1.78,0,1,0-3.56-.31L56.62,71.74A1.78,1.78,0,0,0,58.24,73.67Z"*/}
+//       {/* />*/}
+//       {/* <path*/}
+//       {/* className="cls-1"*/}
+//       {/* d="M50.74,73.68a1.79,1.79,0,0,0,1.78-1.78V40.61a1.78,1.78,0,1,0-3.57,0V71.89A1.79,1.79,0,0,0,50.74,73.68Z"*/}
+//       {/* />*/}
+//       {/* </svg>*/}
+//       {/* {i18n.deleteOption}*/}
+//       {/* </button>*/}
+//       {/* , Constants.locstr.list.ttdeleteOption)}*/}
+//       <button>Delete Option</button>
+//     </p>
+//   </div>
+// );
+//
 
-class QuizEdit extends React.PureComponent {
+const answerType = Types.shape(
+  {
+    label: Types.string,
+    correct: Types.bool,
+    id: Types.string
+  });
 
-  static get propTypes() {
-    return {
-      question_id: Types.string,
-      answer_options: Types.arrayOf(itemType),
-      changeAreaContent: Types.func.isRequired
-    }
+function createDefaultQuestion() {
+  return {
+    question_id: '',
+    start: 0,
+    end: 10,
+    id: generateId()
   };
+}
+
+
+class Answer extends React.Component {
 
   static get defaultProps() {
     return {
-      question_id: '',
-      answer_options: []
-    }
-  };
+      label: 'not defined',
+      correct: false
+    };
+  }
 
   constructor(props) {
     super(props);
-    // autobind(this);
-    this.state = {numChildren: 0};
+    this.state = {};
   }
 
-  onAddChild() {
-    this.setState({
-      numChildren: this.state.numChildren + 1
-    });
+  setContent(key, value) {
+    this.setState({ [key]: value });
+    // this.props.changeAreaContent(99);
   }
-
-  // setContent(key, value) {
-  //   this.props.changeAreaContent({ [key]: value });
-  // }
-
-  // setContent(key, value, itemId = false) {
-  //   if (itemId) {
-  //     const { answer_options } = this.props;
-  //     answer_options[key] = value;
-  //     this.props.changeAreaContent({ answer_options });
-  //   }
-  // }
-
-  // setPageCallbackFunction(itemId, selectedPage) {
-  //   if (this.props.listArray.find(d => d.id === itemId).descriptionEdited) {
-  //     this.updateItem(
-  //       {
-  //         appUrl: selectedPage.url,
-  //         id: itemId
-  //       });
-  //   } else {
-  //     this.updateItem(
-  //       {
-  //         appUrl: selectedPage.url,
-  //         description: selectedPage.title,
-  //         id: itemId
-  //       });
-  //   }
-  // }
-
-  // addItem() {
-  //   const {answer_options} = this.props;
-  //   const newOption = createDefaultItem();
-  //   answer_options.push(newOption);
-  //   this.props.changeAreaContent({answer_options});
-  // }
-  //
-  // deleteItem(itemId) {
-  //   let {listArray} = this.props;
-  //   const idx = listArray.findIndex(({id}) => id === itemId);
-  //   listArray = listArray.concat();
-  //   listArray.splice(idx, 1);
-  //   this.props.changeAreaContent({listArray});
-  // }
-
-  /* guess this just updates the state of the currently dragged item*/
-
-
-  // updateItem(item) {
-  //   const listArray = [...this.props.listArray];
-  //   const idx = listArray.findIndex(curItem => item.id === curItem.id);
-  //   listArray[idx] = Object.assign({}, listArray[idx], item);
-  //   this.props.changeAreaContent({listArray});
-  // }
-
 
   render() {
-    const children = [];
-
-    for (let i = 0; i < this.state.numChildren; i += 1) {
-      children.push(<ChildComponent key={i} number={i}/>);
-    }
-
+    const label = 'Answer:';
     return (
-      <ParentComponent addChild={this.onAddChild.bind(this)}>
-        {children}
-      </ParentComponent>
+      <div className="answer">
+        {label}
+        <input
+          type="text"
+          onChange={e => this.setContent('label', e.target.value)}
+        />{this.state.label}
+      </div>
     );
   }
 }
 
+class Question extends React.Component {
 
-const ParentComponent = props => (
-  <div className="component editHeader">
-    <h2>Quiz Settings</h2>
-    <p>
-      Question Id: <input type="text" value={props.question_id}/>
-      <button onClick={props.addChild} onKeyPress={noSubmitOnEnter}>Add answer option</button>
-    </p>
+  static propTypes = {
+    id: Types.string.isRequired,
+    question_id: Types.string.isRequired,
+    changeAreaContent: Types.func.isRequired
+  };
 
-    <div id="children-pane">
-      {props.children}
-    </div>
-  </div>
-);
-const ChildComponent = props => (
-  <div>
-    <p>Answer Option:
-      <input
-        type="text"
-        // type="text" value={props.children.label}
-        // onChange={e => childProps.setContent(props.children.id, 'label', e.target.value)}
-      />
-      <input type="radio" id="" name="question_xx" value="x"/>
-      Remote Key<select id="" name="question_xx" value="x">
-        {sharedProps().remoteKeys.map(i => (<option value={i.key}>{i.label}</option>))}
-      </select>
-      {/* {getTooltipped(*/}
-      {/* <button*/}
-      {/* type="button"*/}
-      {/* className="right white_blue button img_left"*/}
-      {/* // style={{ position: 'absolute', right: 10, bottom: 10 }}*/}
-      {/* // onClick={() => childProps.deleteItem(props.children.id)}*/}
-      {/* >*/}
-      {/* <svg*/}
-      {/* id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"*/}
-      {/* viewBox="0 0 100 100"*/}
-      {/* >*/}
-      {/* <path*/}
-      {/* className="cls-1"*/}
-      {/* d="M68.26,31.71h-35a1.78,1.78,0,0,0-1.78,1.94l3.78,44.48A1.78,1.78,0,0,0,37,79.76H64.49a1.78,1.78,0,0,0,1.78-1.63L70,33.65a1.78,1.78,0,0,0-1.78-1.94ZM62.85,76.19H38.64L35.17,35.28H66.32Z"*/}
-      {/* />*/}
-      {/* <path*/}
-      {/* className="cls-1"*/}
-      {/* d="M69.17,26.34H52.53V24.23a1.78,1.78,0,0,0-3.57,0v2.11H32.32a1.78,1.78,0,0,0,0,3.57H69.17a1.78,1.78,0,1,0,0-3.57Z"*/}
-      {/* />*/}
-      {/* <path*/}
-      {/* className="cls-1"*/}
-      {/* d="M41.31,72a1.78,1.78,0,0,0,1.78,1.63h.16a1.78,1.78,0,0,0,1.62-1.93L42.18,40.53a1.78,1.78,0,0,0-3.56.31Z"*/}
-      {/* />*/}
-      {/* <path*/}
-      {/* className="cls-1"*/}
-      {/* d="M58.24,73.67h.16A1.78,1.78,0,0,0,60.17,72l2.68-31.22a1.78,1.78,0,1,0-3.56-.31L56.62,71.74A1.78,1.78,0,0,0,58.24,73.67Z"*/}
-      {/* />*/}
-      {/* <path*/}
-      {/* className="cls-1"*/}
-      {/* d="M50.74,73.68a1.79,1.79,0,0,0,1.78-1.78V40.61a1.78,1.78,0,1,0-3.57,0V71.89A1.79,1.79,0,0,0,50.74,73.68Z"*/}
-      {/* />*/}
-      {/* </svg>*/}
-      {/* {i18n.deleteOption}*/}
-      {/* </button>*/}
-      {/* , Constants.locstr.list.ttdeleteOption)}*/}
-      <button>Delete Option</button>
-    </p>
-  </div>
-);
+  static defaultProps = {
+    question_id: 99
+  };
 
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      question_id: null,
+      answers: [],
+      start_tms: null,
+      end_tms: null
+    };
+  }
+
+  setContent(key, value) {
+    this.setState({ [key]: value });
+    // let { question_id } = this.props;
+    // question_id = 99;
+    // this.props.changeAreaContent({ question_id });
+  }
+
+  addAnswer(e) {
+    e.preventDefault();
+    const answers = this.state.answers;
+    answers.push(null);
+    this.setState({
+      answers
+    });
+
+    console.log('Question ' + this.props.children)
+  }
+
+  render() {
+    const label = 'Question:';
+
+    const answers = [];
+
+    for (let i = 0; i < this.state.answers.length; i++) {
+      answers.push(<Answer id={i} />);
+    }
+
+    return (
+      <div className="question">
+        {label}<input
+          type="text"
+          onChange={e => this.setContent('question_id', e.target.value)}
+        />{this.props.question_id}
+        Start: <input type="text" />
+        End: <input type="text" />
+        <button onClick={e => this.addAnswer(e)}>Add answer option</button>
+        <div className="new-answer">
+          {answers}
+        </div>
+      </div>
+    );
+  }
+}
+
+class Quiz extends React.Component {
+
+  static propTypes = {
+    id: Types.string.isRequired,
+    question_id: Types.string.isRequired,
+    listArray: Types.arrayOf(answerType),
+    changeAreaContent: Types.func.isRequired
+  };
+
+  static defaultProps = {
+    question_id: 99,
+    listArray: [createDefaultQuestion()]
+  };
+
+  constructor() {
+    super();
+    this.state = {
+      questions: []
+    };
+  }
+
+  setContent(itemId, key, value) {
+    let { listArray } = this.props;
+    const idx = listArray.findIndex(({ id }) => id === itemId);
+    listArray = listArray.concat();
+    listArray[idx][key] = value;
+    this.props.changeAreaContent({ listArray });
+  }
+
+  addQuestion(e) {
+    e.preventDefault();
+    const questions = this.state.questions;
+    questions.push(null);
+    this.setState({
+      questions
+    });
+    console.log('Quiz ' + this.props.children)
+
+  }
+
+  render() {
+    const questions = [];
+
+    for (let i = 0; i < this.state.questions.length; i++) {
+      questions.push(<Question childProps={this.props} />);
+    }
+
+    return (
+      <div className="component editHeader">
+        {/* <h2>{Constants.locstr.list.listSettings}</h2>*/}
+        <h2>Quiz Settings</h2>
+        <button type="button" onClick={e => this.addQuestion(e)}>Add Question</button>
+        {questions}
+        {/* <Preview />*/}
+      </div>
+    );
+  }
+}
 
 componentLoader.registerComponent(
   'quiz',
-  {edit, preview},
+  { edit, preview },
   {
     isHotSpottable: true,
     isScrollable: false,
@@ -263,4 +446,3 @@ componentLoader.registerComponent(
     navigable: false
   }
 );
-
