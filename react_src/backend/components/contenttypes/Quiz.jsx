@@ -37,14 +37,18 @@ import { generateId } from '../../../functions';
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const { id, changeAreaContent } = params;
+  const { id, data, changeAreaContent } = params;
   return (
-    <Quiz id={id} changeAreaContent={changeAreaContent} />
+    <Quiz
+      id={id}
+      {...(data === '' ? undefined : data)}
+      changeAreaContent={changeAreaContent}
+    />
   );
 }
 
 function preview() {
-  const items = (content.data) ? content.data.listArray : [];
+  const items = (content.data) ? content.data.questions : [];
   return (
     <div className="mpat-content-preview quizcontent-preview">
       <QuizOff />
@@ -264,15 +268,31 @@ const answerType = Types.shape(
     id: Types.string
   });
 
-function createDefaultQuestion() {
+
+function createDefaultAnswer() {
   return {
-    question_id: '',
-    start: 0,
-    end: 10,
+    label: '',
+    correct: false,
     id: generateId()
   };
 }
 
+const questionType = Types.shape(
+  {
+    start: Types.string,
+    end: Types.bool,
+    id: Types.string,
+    label: Types.string
+  });
+
+function createDefaultQuestion() {
+  return {
+    start: null,
+    end: null,
+    label: 'no label',
+    id: generateId()
+  };
+}
 
 class Answer extends React.Component {
 
@@ -285,6 +305,7 @@ class Answer extends React.Component {
 
   constructor(props) {
     super(props);
+    autobind(this);
     this.state = {};
   }
 
@@ -311,22 +332,23 @@ class Question extends React.Component {
 
   static propTypes = {
     id: Types.string.isRequired,
-    question_id: Types.string.isRequired,
+    label: Types.string,
+    answers: Types.arrayOf(answerType),
     changeAreaContent: Types.func.isRequired
   };
 
   static defaultProps = {
-    question_id: 99
+    answers: [createDefaultAnswer()]
   };
 
 
   constructor(props) {
     super(props);
+    autobind(this);
     this.state = {
-      question_id: null,
       answers: [],
-      start_tms: null,
-      end_tms: null
+      start: null,
+      end: null
     };
   }
 
@@ -344,13 +366,9 @@ class Question extends React.Component {
     this.setState({
       answers
     });
-
-    console.log('Question ' + this.props.children)
   }
 
   render() {
-    const label = 'Question:';
-
     const answers = [];
 
     for (let i = 0; i < this.state.answers.length; i++) {
@@ -359,16 +377,17 @@ class Question extends React.Component {
 
     return (
       <div className="question">
-        {label}<input
+        Question<input
           type="text"
-          onChange={e => this.setContent('question_id', e.target.value)}
-        />{this.props.question_id}
+          onChange={e => this.props.setContent(this.props.id, 'label', e.target.value)}
+        />
         Start: <input type="text" />
         End: <input type="text" />
-        <button onClick={e => this.addAnswer(e)}>Add answer option</button>
+        <button onClick={(e) => this.addAnswer(e)}>Add answer option</button>
         <div className="new-answer">
           {answers}
         </div>
+        id: {this.props.id}
       </div>
     );
   }
@@ -378,47 +397,57 @@ class Quiz extends React.Component {
 
   static propTypes = {
     id: Types.string.isRequired,
-    question_id: Types.string.isRequired,
-    listArray: Types.arrayOf(answerType),
-    changeAreaContent: Types.func.isRequired
+    questions: Types.arrayOf(questionType),
+    changeAreaContent: Types.func.isRequired,
+    test: Types.number
   };
 
   static defaultProps = {
-    question_id: 99,
-    listArray: [createDefaultQuestion()]
+    questions: [],
+    test: 999999
   };
 
   constructor() {
     super();
+    autobind(this);
     this.state = {
       questions: []
     };
   }
 
   setContent(itemId, key, value) {
-    let { listArray } = this.props;
-    const idx = listArray.findIndex(({ id }) => id === itemId);
-    listArray = listArray.concat();
-    listArray[idx][key] = value;
-    this.props.changeAreaContent({ listArray });
+    let { questions } = this.state;
+    const idx = questions.findIndex(({ id }) => id === itemId);
+    questions = questions.concat();
+    questions[idx][key] = value;
+    this.setState(state => ({ questions }));
+
+    this.props.changeAreaContent({ questions }); // error here --> how to set questions array correctly?
+    this.props.changeAreaContent({ test: 10000 });
   }
 
   addQuestion(e) {
     e.preventDefault();
     const questions = this.state.questions;
-    questions.push(null);
-    this.setState({
-      questions
-    });
-    console.log('Quiz ' + this.props.children)
+    questions.push(createDefaultQuestion());
+    this.setState(state => ({ questions }));
+    this.addContent();
+  }
 
+  addContent() {
+    let { questions } = this.state;
+    this.props.changeAreaContent({ questions });
   }
 
   render() {
     const questions = [];
+    const test = [];
 
     for (let i = 0; i < this.state.questions.length; i++) {
-      questions.push(<Question childProps={this.props} />);
+      questions.push(<Question
+        id={this.state.questions[i].id}
+        setContent={this.setContent}
+      />);
     }
 
     return (
@@ -427,7 +456,16 @@ class Quiz extends React.Component {
         <h2>Quiz Settings</h2>
         <button type="button" onClick={e => this.addQuestion(e)}>Add Question</button>
         {questions}
-        {/* <Preview />*/}
+        State Length: {this.state.questions.length}
+        Props Length: {this.props.questions.length}
+        {this.props.questions.map((item, i) => (
+          <div>{item.label}</div>
+          ))}
+
+        {this.state.questions.map((item, i) => (
+          <div>{item.label}</div>
+          ))}
+
       </div>
     );
   }

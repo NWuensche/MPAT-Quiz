@@ -200,55 +200,55 @@ function ListElement(props) {
     >
       <table>
         <tbody>
-          <tr>
-            <td>
-              <label>{Constants.locstr.list.title}: </label>
-            </td>
-            <td>
-              {getTooltipped(
-                <input
-                  type="text"
-                  placeholder={Constants.locstr.list.placeHolderTitle}
-                  value={props.children.title}
-                  onKeyPress={noSubmitOnEnter}
-                  onChange={e => childProps.setContent(props.children.id, 'title', e.target.value)}
-                />
-                , Constants.locstr.list.ttTitle)}
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label>{Constants.locstr.list.url}: </label>
-            </td>
-            <td>
-              {getTooltipped(
-                <input
-                  type="text"
-                  placeholder={Constants.locstr.list.placeHolderUrl}
-                  value={props.children.appUrl}
-                  onKeyPress={noSubmitOnEnter}
-                  onChange={e => childProps.setContent(props.children.id, 'appUrl', e.target.value)}
-                />
-                , Constants.locstr.list.ttUrl)}
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label>{Constants.locstr.list.description}: </label>
-            </td>
-            <td>
-              {getTooltipped(
-                <input
-                  type="text"
-                  placeholder={Constants.locstr.list.placeHolderDesc}
-                  value={props.children.description}
-                  onKeyPress={noSubmitOnEnter}
-                  onChange={e => childProps.setContent(props.children.id, 'description',
-                    e.target.value)}
-                />
-                , Constants.locstr.list.ttDesc)}
-            </td>
-          </tr>
+        <tr>
+          <td>
+            <label>{Constants.locstr.list.title}: </label>
+          </td>
+          <td>
+            {getTooltipped(
+              <input
+                type="text"
+                placeholder={Constants.locstr.list.placeHolderTitle}
+                value={props.children.title}
+                onKeyPress={noSubmitOnEnter}
+                onChange={e => childProps.setContent(props.children.id, 'title', e.target.value)}
+              />
+              , Constants.locstr.list.ttTitle)}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>{Constants.locstr.list.url}: </label>
+          </td>
+          <td>
+            {getTooltipped(
+              <input
+                type="text"
+                placeholder={Constants.locstr.list.placeHolderUrl}
+                value={props.children.appUrl}
+                onKeyPress={noSubmitOnEnter}
+                onChange={e => childProps.setContent(props.children.id, 'appUrl', e.target.value)}
+              />
+              , Constants.locstr.list.ttUrl)}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>{Constants.locstr.list.description}: </label>
+          </td>
+          <td>
+            {getTooltipped(
+              <input
+                type="text"
+                placeholder={Constants.locstr.list.placeHolderDesc}
+                value={props.children.description}
+                onKeyPress={noSubmitOnEnter}
+                onChange={e => childProps.setContent(props.children.id, 'description',
+                  e.target.value)}
+              />
+              , Constants.locstr.list.ttDesc)}
+          </td>
+        </tr>
         </tbody>
       </table>
       {getTooltipped(

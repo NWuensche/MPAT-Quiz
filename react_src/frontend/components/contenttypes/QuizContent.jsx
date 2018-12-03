@@ -27,6 +27,7 @@ class QuizContent extends React.Component {
   componentWillUnmount() {
     unregisterHandlers(this);
   }
+
   //
   // up() {
   //   const state = this.state;
@@ -55,26 +56,41 @@ class QuizContent extends React.Component {
   // }
 
   render() {
-    const items = this.props.question_id;
-    console.log("Hier " + items)
+    const items = this.props.questions;
+    const test = this.props.test;
+    // const abc = [];
+    // for (let i = 0; i < items.length; i++) {
+    //   abc.push(<div>Test</div>);
+    // }
+
     return (
       <div>
-
- hkaSJ'
-        SKJADJLÖ
-        SADKAJSD'
-
-        ASLDJKADW
-        Hallo
-        Hallo
-        Hallo
-        {items}
-        {items}
-        {items}
+        Hier sollte was stehen
+        {test}
+        {/*{abc}*/}
+        {/* {items.map((item) => (*/}
+        {/* <QuizButton*/}
+        {/* item={item}*/}
+        {/* isSelected={item.correct}*/}
+        {/* />*/}
+        {/* ))}*/}
       </div>
     );
   }
 }
+
+// function QuizButton({ item, isSelected }) {
+//   let css;
+//   if (isSelected) {
+//     css = { border: '2px #f00 solid', margin: '10px', padding: '10x' };
+//   } else { css = { border: '2px #ddd solid', margin: '10px', padding: '10x' }; }
+//   return (
+//     <div style={css}>
+//       <button >{item.label}</button>
+//     </div>
+//   );
+// }
+
 
 componentLoader.registerComponent('quiz', { view: QuizContent }, {
   isStylable: true
