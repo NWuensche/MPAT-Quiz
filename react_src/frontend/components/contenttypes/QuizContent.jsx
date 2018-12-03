@@ -67,6 +67,9 @@ class QuizContent extends React.Component {
       <div>
         Hier sollte was stehen
         {test}
+        {this.props.questions.map((item, i) => (
+          <div>{item.label}</div>
+          ))}
         {/*{abc}*/}
         {/* {items.map((item) => (*/}
         {/* <QuizButton*/}
