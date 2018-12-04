@@ -56,43 +56,30 @@ class QuizContent extends React.Component {
   // }
 
   render() {
-    const items = this.props.questions;
-    const test = this.props.test;
-    // const abc = [];
-    // for (let i = 0; i < items.length; i++) {
-    //   abc.push(<div>Test</div>);
-    // }
-
+    const answers = this.props.answers
     return (
       <div>
-        Hier sollte was stehen
-        {test}
-        {this.props.questions.map((item, i) => (
-          <div>{item.label}</div>
-          ))}
-        {/*{abc}*/}
-        {/* {items.map((item) => (*/}
-        {/* <QuizButton*/}
-        {/* item={item}*/}
-        {/* isSelected={item.correct}*/}
-        {/* />*/}
-        {/* ))}*/}
+        {answers.map((answer, i) => (
+         <QuizButton
+         item={answer}
+         />
+         ))}
       </div>
     );
   }
 }
 
-// function QuizButton({ item, isSelected }) {
-//   let css;
-//   if (isSelected) {
-//     css = { border: '2px #f00 solid', margin: '10px', padding: '10x' };
-//   } else { css = { border: '2px #ddd solid', margin: '10px', padding: '10x' }; }
-//   return (
-//     <div style={css}>
-//       <button >{item.label}</button>
-//     </div>
-//   );
-// }
+function QuizButton({ item, isSelected=false}) {
+  let css;
+  if (isSelected) {
+    css = { border: '2px #f00 solid', margin: '10px', padding: '10x' };
+  } else { css = { border: '2px #ddd solid', margin: '10px', padding: '10x' }; }
+  return (
+    <div style={css}>
+      <button>{item.label}</button>
+    </div>
+  );
+}
 
 
 componentLoader.registerComponent('quiz', { view: QuizContent }, {
