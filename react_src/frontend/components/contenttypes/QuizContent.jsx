@@ -19,8 +19,8 @@ class QuizContent extends React.Component {
   componentDidMount() {
     // Register Key Handlers
     registerHandlers(this, handlersWithTag('active', [
-      createHandler(KeyEvent.VK_UP, this.up),
-      createHandler(KeyEvent.VK_DOWN, this.down),
+      createHandler(KeyEvent.VK_UP, this.up.bind(this)),
+      createHandler(KeyEvent.VK_DOWN, this.down.bind(this)),
       createHandler(KeyEvent.VK_ENTER,  this.enter.bind(this)),
     ]));
   }
@@ -57,6 +57,25 @@ class QuizContent extends React.Component {
   // }
     //
 
+  // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
+  newMod(m, n) {
+    return ((m%n)+n)%n;
+  }
+
+  up() {
+      const numAnswers = this.props.answers.length;
+      this.setState(prevState => ({
+                  ...prevState,
+                  selectedButton: this.newMod((prevState.selectedButton - 1),  numAnswers),
+      }))
+  }
+  down() {
+      const numAnswers = this.props.answers.length;
+      this.setState(prevState => ({
+                  ...prevState,
+                  selectedButton: this.newMod((prevState.selectedButton + 1), numAnswers),
+      }))
+  }
   enter() {
       this.setState(prevState => ({
                   ...prevState,
