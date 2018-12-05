@@ -29,34 +29,6 @@ class QuizContent extends React.Component {
     unregisterHandlers(this);
   }
 
-  //
-  // up() {
-  //   const state = this.state;
-  //   state.currentIndex--;
-  //   if (state.currentIndex < 0) {
-  //     state.currentIndex = this.props.listArray.length - 1;
-  //   }
-  //   this.setState(state);
-  //   trackAction('list', 'up', this.props.listArray[state.currentIndex].description);
-  // }
-  //
-  // down() {
-  //   const state = this.state;
-  //   state.currentIndex++;
-  //   if (state.currentIndex >= this.props.listArray.length) {
-  //     state.currentIndex = 0;
-  //   }
-  //   this.setState(state);
-  //   trackAction('list', 'down', this.props.listArray[state.currentIndex].description);
-  // }
-  //
-  // enter() {
-  //   const url = this.props.listArray[this.state.currentIndex].appUrl;
-  //   trackAction('list', 'goto', url);
-  //   window.location.href = url;
-  // }
-    //
-
   // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
   newMod(m, n) {
     return ((m%n)+n)%n;
