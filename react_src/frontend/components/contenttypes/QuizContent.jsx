@@ -11,7 +11,7 @@ class QuizContent extends React.Component {
   constructor() {
     super();
     this.state = {
-      currentIndex: 0
+      selectedButton: 0
     };
   }
 
@@ -60,9 +60,10 @@ class QuizContent extends React.Component {
     return (
       <div>
         {answers.map((answer, i) => (
-         <QuizButton
-         item={answer}
-         />
+             <QuizButton
+             item={answer}
+             isSelected={i == this.state.selectedButton}
+             />
          ))}
       </div>
     );
@@ -80,6 +81,7 @@ function QuizButton({ item, isSelected=false}) {
     </div>
   );
 }
+
 
 
 componentLoader.registerComponent('quiz', { view: QuizContent }, {
