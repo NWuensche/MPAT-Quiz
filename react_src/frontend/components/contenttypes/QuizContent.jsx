@@ -11,7 +11,8 @@ class QuizContent extends React.Component {
   constructor() {
     super();
     this.state = {
-      selectedButton: 0
+      selectedButton: 0,
+      enteredButton: -1, // -1 = nothing entered, i = Button i selected
     };
   }
 
@@ -20,7 +21,7 @@ class QuizContent extends React.Component {
     registerHandlers(this, handlersWithTag('active', [
       createHandler(KeyEvent.VK_UP, this.up),
       createHandler(KeyEvent.VK_DOWN, this.down),
-      createHandler(KeyEvent.VK_ENTER, this.enter)
+      createHandler(KeyEvent.VK_ENTER,  this.enter.bind(this)),
     ]));
   }
 
@@ -54,7 +55,14 @@ class QuizContent extends React.Component {
   //   trackAction('list', 'goto', url);
   //   window.location.href = url;
   // }
+    //
 
+  enter() {
+      this.setState(prevState => ({
+                  ...prevState,
+                  enteredButton: prevState.selectedButton,
+      }))
+  }
   render() {
     const answers = this.props.answers
     return (
@@ -63,18 +71,26 @@ class QuizContent extends React.Component {
              <QuizButton
              item={answer}
              isSelected={i == this.state.selectedButton}
+             isEntered={i == this.state.enteredButton}
              />
          ))}
+        entered:{this.state.enteredButton}
       </div>
     );
   }
 }
 
-function QuizButton({ item, isSelected=false}) {
+function QuizButton({ item, isSelected=false, isEntered=false}) {
   let css;
-  if (isSelected) {
+  if (isEntered) {
+    css = { border: '2px #0f0 solid', margin: '10px', padding: '10x' };
+  }
+    else if (isSelected) {
     css = { border: '2px #f00 solid', margin: '10px', padding: '10x' };
-  } else { css = { border: '2px #ddd solid', margin: '10px', padding: '10x' }; }
+  } 
+    else { 
+     css = { border: '2px #ddd solid', margin: '10px', padding: '10x' }; 
+  }
   return (
     <div style={css}>
       <button>{item.label}</button>
