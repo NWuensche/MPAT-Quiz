@@ -25,19 +25,19 @@
  * Marco Ferrari (marco.ferrari@finconsgroup.com)
  *
  **/
-import React, {PropTypes as Types} from 'react';
+import React, { PropTypes as Types } from 'react';
 import autobind from 'class-autobind';
-import {componentLoader} from '../../../ComponentLoader';
-import {noSubmitOnEnter} from '../../utils';
-import {getTooltipped} from '../../tooltipper';
+import { componentLoader } from '../../../ComponentLoader';
+import { noSubmitOnEnter } from '../../utils';
+import { getTooltipped } from '../../tooltipper';
 import Constants from '../../../constants';
-import {generateId} from '../../../functions';
+import { generateId } from '../../../functions';
 
 
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const {id, data, changeAreaContent} = params;
+  const { id, data, changeAreaContent } = params;
   return (
     <Quiz
       id={id}
@@ -60,23 +60,23 @@ function sharedProps() {
   return {
     // updateItem: this.updateItem,
     remoteKeys: [
-      {key: '', label: 'Select Remote Button'},
-      {key: 'VK_0', label: '0', disabled: false},
-      {key: 'VK_1', label: '1', disabled: false},
-      {key: 'VK_2', label: '2', disabled: false},
-      {key: 'VK_3', label: '3', disabled: false},
-      {key: 'VK_4', label: '4', disabled: false},
-      {key: 'VK_5', label: '5', disabled: false},
-      {key: 'VK_6', label: '6', disabled: false},
-      {key: 'VK_7', label: '7', disabled: false},
-      {key: 'VK_8', label: '8', disabled: false},
-      {key: 'VK_9', label: '9', disabled: false},
-      {key: 'VK_RED', label: 'red', disabled: false},
-      {key: 'VK_YELLOW', label: 'yellow', disabled: false},
-      {key: 'VK_GREEN', label: 'green', disabled: false},
-      {key: 'VK_BLUE', label: 'blue', disabled: false},
-      {key: 'VK_BACK', label: 'back', disabled: false},
-      {key: 'VK_OK', label: 'ok', disabled: false}
+      { key: '', label: 'Select Remote Button' },
+      { key: 'VK_0', label: '0', disabled: false },
+      { key: 'VK_1', label: '1', disabled: false },
+      { key: 'VK_2', label: '2', disabled: false },
+      { key: 'VK_3', label: '3', disabled: false },
+      { key: 'VK_4', label: '4', disabled: false },
+      { key: 'VK_5', label: '5', disabled: false },
+      { key: 'VK_6', label: '6', disabled: false },
+      { key: 'VK_7', label: '7', disabled: false },
+      { key: 'VK_8', label: '8', disabled: false },
+      { key: 'VK_9', label: '9', disabled: false },
+      { key: 'VK_RED', label: 'red', disabled: false },
+      { key: 'VK_YELLOW', label: 'yellow', disabled: false },
+      { key: 'VK_GREEN', label: 'green', disabled: false },
+      { key: 'VK_BLUE', label: 'blue', disabled: false },
+      { key: 'VK_BACK', label: 'back', disabled: false },
+      { key: 'VK_OK', label: 'ok', disabled: false }
     ]
   };
 }
@@ -130,11 +130,11 @@ class Answer extends React.Component {
 
   render() {
     return (
-      <div className="answer" style={{display: 'table-cell'}}>
+      <div className="answer" style={{ display: 'table-cell' }}>
         Label<input
-        type="text"
-        onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
-      />
+          type="text"
+          onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
+        />
       </div>
     );
   }
@@ -145,7 +145,7 @@ class Question extends React.Component {
   static propTypes = {
     id: Types.string.isRequired,
     label: Types.string,
-    correct_answer: Types.string,
+    correct_answer: Types.number,
     changeAreaContent: Types.func.isRequired
   };
 
@@ -167,13 +167,14 @@ class Question extends React.Component {
 
     for (let i = 0; i < this.props.answers.length; i++) {
       radioButtons.push(
-        <div style={{display: 'table-cell'}}>
-          <label for={this.props.answers[i].id}>{this.props.answers[i].label}</label>
-          <input type="radio"
-                 name={this.props.id}
-                 id={this.props.answers[i].id}
-                 value={this.props.answers[i].id}
-                 onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}
+        <div style={{ display: 'table-cell' }}>
+          <label htmlFor={this.props.answers[i].id}>{this.props.answers[i].label}</label>
+          <input
+            type="radio"
+            name={this.props.id}
+            id={this.props.answers[i].id}
+            value={i}
+            onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}
           />
         </div>
       );
@@ -181,22 +182,22 @@ class Question extends React.Component {
     return (
       <div className="question">
         Question<input
-        type="text"
-        onChange={e => this.props.setContent(this.props.id, 'label', e.target.value)}
-      />
+          type="text"
+          onChange={e => this.props.setContent(this.props.id, 'label', e.target.value)}
+        />
         <div>
           Start Timestamp: <input
-          type="number"
-          onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
-        /> sec
+            type="number"
+            onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
+          /> sec
           End Timestamp <input
-          type="number"
-          onChange={e => this.props.setContent(this.props.id, 'end_tms', e.target.value)}
-        /> sec
+            type="number"
+            onChange={e => this.props.setContent(this.props.id, 'end_tms', e.target.value)}
+          /> sec
         </div>
         <div>
           <p>Choose the correct answer:</p>
-          <div style={{display: 'table'}}>
+          <div style={{ display: 'table' }}>
             {radioButtons}
           </div>
         </div>
@@ -211,7 +212,7 @@ class Quiz extends React.Component {
     id: Types.string.isRequired,
     questions: Types.arrayOf(questionType),
     answers: Types.arrayOf(answerType),
-    changeAreaContent: Types.func.isRequired
+    changeAreaContent: Types.func.isRequired,
   };
 
   static defaultProps = {
@@ -229,12 +230,12 @@ class Quiz extends React.Component {
   }
 
   setContent(itemId, key, value) {
-    let {questions} = this.state;
-    const idx = questions.findIndex(({id}) => id === itemId);
+    let { questions } = this.state;
+    const idx = questions.findIndex(({ id }) => id === itemId);
     questions = questions.concat();
     questions[idx][key] = value;
-    this.setState(state => ({questions}));
-    this.props.changeAreaContent({questions});
+    this.setState(state => ({ questions }));
+    this.props.changeAreaContent({ questions });
   }
 
 
@@ -255,20 +256,20 @@ class Quiz extends React.Component {
     this.setState({
       answers
     });
-    this.props.changeAreaContent({answers});
+    this.props.changeAreaContent({ answers });
   }
 
   addQuestion(e) {
     e.preventDefault();
     const questions = this.state.questions;
     questions.push(createDefaultQuestion());
-    this.setState(state => ({questions}));
+    this.setState(state => ({ questions }));
     this.addContent();
   }
 
   addContent() {
-    const {questions} = this.state;
-    this.props.changeAreaContent({questions});
+    const { questions } = this.state;
+    this.props.changeAreaContent({ questions });
   }
 
   setCorrectAnswer() {
@@ -276,12 +277,12 @@ class Quiz extends React.Component {
   }
 
   changeAnswerLabel(itemId, key, value) {
-    let {answers} = this.state;
-    const idx = answers.findIndex(({id}) => id === itemId);
+    let { answers } = this.state;
+    const idx = answers.findIndex(({ id }) => id === itemId);
     answers = answers.concat();
     answers[idx][key] = value;
-    this.setState(state => ({answers}));
-    this.props.changeAreaContent({answers});
+    this.setState(state => ({ answers }));
+    this.props.changeAreaContent({ answers });
   }
 
   render() {
@@ -310,26 +311,22 @@ class Quiz extends React.Component {
         <h2>Quiz Settings</h2>
         Answers:
         <button onClick={e => this.addAnswer(e)}>Add answer option</button>
-        <div style={{display: 'table'}}>
+        <div style={{ display: 'table' }}>
           {answer_options}
         </div>
         <button type="button" onClick={e => this.addQuestion(e)}>Add Question</button>
         <div>
           {questions}
         </div>
-        {this.props.questions.map((item, i) => {
-          return (
-            <p>{item.correct_answer} {item.start_tms} {item.end_tms}</p>
-          )
-        })}
       </div>
     );
   }
 }
 
+
 componentLoader.registerComponent(
   'quiz',
-  {edit, preview},
+  { edit, preview },
   {
     isHotSpottable: true,
     isScrollable: false,
