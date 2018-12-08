@@ -47,7 +47,9 @@ class QuizContent extends React.Component {
           ...prevState,
           timeEnterOver: true, // Can't enter a button anymore
         }));
-        this.updateScore();
+		if (this.state.correct == this.state.enteredButton) {
+			this.setState({score: this.state.score + 1});
+		}
       }, question.end_tms * 1000)
     ));
   }
@@ -55,7 +57,7 @@ class QuizContent extends React.Component {
   componentWillUnmount() {
     unregisterHandlers(this);
   }
-
+/*  
   updateScore() {
     let {score} = this.state;
     if (this.state.correct === this.state.enteredButton) {
@@ -63,7 +65,16 @@ class QuizContent extends React.Component {
     }
     this.setState({score});
   }
+  
 
+  updateScore() {
+	if (this.state.correct == this.state.enteredButton) {
+      this.setState({score: this.state.score + 1});
+    }
+  }
+  
+  */
+  
   // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
   newMod(m, n) {
     return ((m % n) + n) % n;
@@ -114,8 +125,9 @@ class QuizContent extends React.Component {
               updateScore={this.updateScore}
             />
           ))}
-          entered:{this.state.enteredButton}
-          correct answer: {this.state.correct}
+          entered: {this.state.enteredButton}
+		  correct: {this.state.correct}
+		  <p>Hello</p>
         </div>
       </div>
     );
