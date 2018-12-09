@@ -15,7 +15,8 @@ class QuizContent extends React.Component {
       enteredButton: -1, // -1 = nothing entered, i = Button i selected
       timeEnterOver: false,
       score: 0,
-      correct: -1
+      correct: -1,
+      currQuestion: -1,
     };
   }
 
@@ -36,7 +37,8 @@ class QuizContent extends React.Component {
           selectedButton: 0, // Start at A again
           enteredButton: -1, // Unlock Buttons for new Question
           timeEnterOver: false, // Unlock Buttons for new Question
-          correct: question.correct_answer
+          correct: question.correct_answer,
+          currQuestion: this.state.currQuestion + 1,
         }));
       }, question.start_tms * 1000)
     ));
@@ -81,8 +83,8 @@ class QuizContent extends React.Component {
   }
 
   up() {
-    // Not allowed to change Button anymore
-    if (this.state.enteredButton !== -1 || this.state.timeEnterOver) {
+    // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
+    if (this.state.enteredButton !== -1 || this.state.timeEnterOver || this.state.currQuestion === -1) {
         return;
     }
 
@@ -94,8 +96,8 @@ class QuizContent extends React.Component {
   }
 
   down() {
-    // Not allowed to change Button anymore
-    if (this.state.enteredButton !== -1 || this.state.timeEnterOver) {
+    // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
+    if (this.state.enteredButton !== -1 || this.state.timeEnterOver || this.state.currQuestion === -1) {
         return;
     }
 
@@ -107,8 +109,8 @@ class QuizContent extends React.Component {
   }
 
   enter() {
-    // Not allowed to enter button when time's up
-    if (this.state.timeEnterOver) {
+    // Not allowed to enter button when time's up or before 1st question
+    if (this.state.timeEnterOver || this.state.currQuestion === -1) {
         return;
     }
     this.setState(prevState => ({
@@ -135,7 +137,7 @@ class QuizContent extends React.Component {
               item={answer}
               isSelected={i === this.state.selectedButton}
               isEntered={i === this.state.enteredButton}
-              dontSelect={this.state.timeEnterOver || (this.state.enteredButton !== -1)} // Time's up or a button already entered
+              dontSelect={this.state.timeEnterOver || (this.state.enteredButton !== -1 || this.state.currQuestion === -1)} // Time's up or a button already entered or before first question
               updateScore={this.updateScore}
             />
           ))}
