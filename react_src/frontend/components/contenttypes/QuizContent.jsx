@@ -126,7 +126,7 @@ class QuizContent extends React.Component {
   render() {
     const answers = this.props.answers;
     return (
-      <div>
+      <div style={{fontSize: 'large', backgroundColor: 'white'}}>
         {/* <QuizScoreContent*/}
         {/* checkAnswer={this.checkAnswer}*/}
         {/* />*/}
