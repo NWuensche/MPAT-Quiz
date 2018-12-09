@@ -81,6 +81,11 @@ class QuizContent extends React.Component {
   }
 
   up() {
+    // Not allowed to change Button anymore
+    if (this.state.enteredButton !== -1 || this.state.timeEnterOver) {
+        return;
+    }
+
     const numAnswers = this.props.answers.length;
     this.setState(prevState => ({
       ...prevState,
@@ -89,6 +94,11 @@ class QuizContent extends React.Component {
   }
 
   down() {
+    // Not allowed to change Button anymore
+    if (this.state.enteredButton !== -1 || this.state.timeEnterOver) {
+        return;
+    }
+
     const numAnswers = this.props.answers.length;
     this.setState(prevState => ({
       ...prevState,
@@ -97,6 +107,10 @@ class QuizContent extends React.Component {
   }
 
   enter() {
+    // Not allowed to enter button when time's up
+    if (this.state.timeEnterOver) {
+        return;
+    }
     this.setState(prevState => ({
       ...prevState,
       enteredButton: prevState.selectedButton
