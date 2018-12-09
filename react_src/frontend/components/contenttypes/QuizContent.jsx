@@ -137,17 +137,34 @@ class QuizContent extends React.Component {
               item={answer}
               isSelected={i === this.state.selectedButton}
               isEntered={i === this.state.enteredButton}
-              dontSelect={this.state.timeEnterOver || (this.state.enteredButton !== -1 || this.state.currQuestion === -1)} // Time's up or a button already entered or before first question
+              dontSelect={this.state.timeEnterOver || this.state.enteredButton !== -1 || this.state.currQuestion === -1} // Time's up or a button already entered or before first question
               updateScore={this.updateScore}
             />
           ))}
           entered: {this.state.enteredButton}
 		  correct: {this.state.correct}
 		  <p>Hello</p>
+            { 
+                <OverText
+                    lastQuestionOver = {this.props.questions.length === this.state.currQuestion +1 && this.state.timeEnterOver}
+                />
+            } 
         </div>
       </div>
     );
   }
+}
+
+// Show hint that quiz is over when last question is over and time to Enter is also over
+function OverText({lastQuestionOver}) {
+    let text = "";
+    if (lastQuestionOver) {
+        text = "Quiz is Over!"
+    }
+    return( <div>
+                {text}
+            </div>
+    );
 }
 
 function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false}) {
