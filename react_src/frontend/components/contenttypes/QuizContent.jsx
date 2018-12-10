@@ -174,7 +174,7 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
   } else if (dontSelect) {
     css = {border: '2px #000 solid', margin: '10px', padding: '10x'};
   } else if (isSelected) {
-    css = {border: '2px #ff0 solid', margin: '10px', padding: '10x'};
+    css = {border: '2px #00f solid', margin: '10px', padding: '10x'};
   } else {
     css = {border: '2px #ddd solid', margin: '10px', padding: '10x'};
   }
