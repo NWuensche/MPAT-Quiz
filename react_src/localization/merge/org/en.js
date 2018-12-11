@@ -370,10 +370,17 @@ const en = {
     ttRepeat: 'Loop/Repeat audio'
   },
   quiz: {
-    title: 'Quiz settings hallo',
-    answer: 'Answer text',
-    placeholderAnswer: 'A',
-    ttAddAnswer: 'Add new answer option',
+    settings: 'Quiz Settings',
+    answers: 'Answer Options',
+    answer_btn: 'Add new answer option',
+    answer_label: 'Label',
+    add_question: 'Add question',
+    ttAddAnswer: 'Add a new label for an answer option',
+    title: 'TITLE',
+    start_tms: 'STARTS AT',
+    end_tms: 'ENDS AT',
+    sec: 'sec',
+    correct_answer: 'CORRECT ANSWER',
     deleteOption: 'Delete',
     ttDeleteOption: 'Delete this answer option'
 
