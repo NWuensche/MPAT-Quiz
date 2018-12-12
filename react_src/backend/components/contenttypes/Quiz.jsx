@@ -32,19 +32,17 @@ import {noSubmitOnEnter} from '../../utils';
 import {getTooltipped} from '../../tooltipper';
 import Constants from '../../../constants';
 import {generateId} from '../../../functions';
-import {ComponentStateSelector} from '../helpers/Inputs';
 
 
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const {id, data, changeAreaContent, getComponentStates} = params;
+  const {id, data, changeAreaContent} = params;
   return (
     <Quiz
       id={id}
       {...(data === '' ? undefined : data)}
       changeAreaContent={changeAreaContent}
-      getComponentStates={getComponentStates}
     />
   );
 }
@@ -110,7 +108,7 @@ function createDefaultQuestion() {
   return {
     start_tms: null,
     end_tms: null,
-    label: 'no label',
+    label: '',
     id: generateId(),
     correct_answer: ''
   };
@@ -127,7 +125,6 @@ class Answer extends React.Component {
   constructor(props) {
     super(props);
     autobind(this);
-    this.state = {};
   }
 
   render() {
@@ -135,6 +132,7 @@ class Answer extends React.Component {
       <div className="answer" style={{display: 'table-cell'}}>
         Label<input
         type="text"
+        value={this.props.label}
         onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
       />
       </div>
@@ -157,30 +155,23 @@ class Question extends React.Component {
   constructor(props) {
     super(props);
     autobind(this);
-    this.state = {
-      start_tms: null,
-      end_tms: null
-    };
   }
 
   render() {
-    const radioButtons = [];
+    const options = [];
 
     for (let i = 0; i < this.props.answers.length; i++) {
-      radioButtons.push(
-        <div style={{display: 'inline'}}>
-          <label for={this.props.answers[i].id}>{this.props.answers[i].label}
-          </label>
-          <input
-            type="radio"
-            name={this.props.id}
-            id={this.props.answers[i].id}
-            value={i}
-            onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}
-          />
-        </div>
+      options.push(
+        <option value={i}>{this.props.answers[i].label}</option>
       );
     }
+    const selector = `select[name='${this.props.id}'] option[value='${this.props.correct_answer}']`;
+    try {
+      document.querySelector(selector).selected = true;
+    } catch (e) {
+
+    }
+
     return (
       <div>
         <div
@@ -201,6 +192,7 @@ class Question extends React.Component {
               <td>
                 <input
                   type="text"
+                  value={this.props.label}
                   onChange={e => this.props.setContent(this.props.id, 'label', e.target.value)}
                 />
               </td>
@@ -212,6 +204,7 @@ class Question extends React.Component {
               <td>
                 <input
                   type="number"
+                  value={this.props.start_tms}
                   onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
                 /> {i18n.sec}
               </td>
@@ -223,6 +216,7 @@ class Question extends React.Component {
               <td>
                 <input
                   type="number"
+                  value={this.props.end_tms}
                   onChange={e => this.props.setContent(this.props.id, 'end_tms', e.target.value)}
                 /> {i18n.sec}
               </td>
@@ -232,23 +226,27 @@ class Question extends React.Component {
                 {i18n.correct_answer}
               </td>
               <td>
-                {radioButtons}
+                <select id={this.props.id}
+                        value={this.props.correct_answer}
+                        onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}>
+                  {options}
+                </select>
               </td>
             </tr>
           </table>
         </div>
-        {/*<div className="list-add-element">*/}
-        {/*<span>*/}
-        {/*<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">*/}
-        {/*<path*/}
-        {/*d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"*/}
-        {/*/>*/}
-        {/*<path*/}
-        {/*d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"*/}
-        {/*/>*/}
-        {/*</svg>*/}
-        {/*</span>*/}
-        {/*</div>*/}
+        {/* <div className="list-add-element">*/}
+        {/* <span>*/}
+        {/* <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">*/}
+        {/* <path*/}
+        {/* d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"*/}
+        {/* />*/}
+        {/* <path*/}
+        {/* d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"*/}
+        {/* />*/}
+        {/* </svg>*/}
+        {/* </span>*/}
+        {/* </div>*/}
       </div>
     );
   }
@@ -265,16 +263,12 @@ class Quiz extends React.Component {
 
   static defaultProps = {
     answers: [createDefaultAnswer()],
-    questions: []
+    questions: [createDefaultQuestion()]
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     autobind(this);
-    this.state = {
-      questions: [],
-      answers: [createDefaultAnswer()]
-    };
   }
 
   componentDidMount() {
@@ -284,82 +278,38 @@ class Quiz extends React.Component {
     });
   }
 
+
   setContent(itemId, key, value) {
-    let {questions} = this.state;
+    let {questions} = this.props;
     const idx = questions.findIndex(({id}) => id === itemId);
     questions = questions.concat();
     questions[idx][key] = value;
-    this.setState(state => ({questions}));
     this.props.changeAreaContent({questions});
   }
 
-
-  // setContentAnswers(questionId, answerId, key, value) {
-  //   let { questions } = this.state;
-  //   const idx = questions.findIndex(({ id }) => id === questionId);
-  //   questions = questions.concat();
-  //   const idxAnswer = questions[idx].answers.findIndex(({ id }) => id === answerId);
-  //   questions[idx].answers[idxAnswer][key] = value;
-  //   this.setState(state => ({ questions }));
-  //   this.props.changeAreaContent({ questions });
-  // }
-
   addAnswer(e) {
     e.preventDefault();
-    const answers = this.state.answers;
+    const {answers} = this.props;
     answers.push(createDefaultAnswer());
-    this.setState({
-      answers
-    });
     this.props.changeAreaContent({answers});
   }
 
   addQuestion(e) {
     e.preventDefault();
-    const questions = this.state.questions;
+    const {questions} = this.props;
     questions.push(createDefaultQuestion());
-    this.setState(state => ({questions}));
-    this.addContent();
-  }
-
-  addContent() {
-    const {questions} = this.state;
     this.props.changeAreaContent({questions});
   }
 
-  setCorrectAnswer() {
-
-  }
-
   changeAnswerLabel(itemId, key, value) {
-    let {answers} = this.state;
+    let {answers} = this.props;
     const idx = answers.findIndex(({id}) => id === itemId);
     answers = answers.concat();
     answers[idx][key] = value;
-    this.setState(state => ({answers}));
     this.props.changeAreaContent({answers});
   }
 
   render() {
-    const questions = [];
-    const answer_options = [];
-
-    for (let i = 0; i < this.state.questions.length; i++) {
-      questions.push(<Question
-        id={this.state.questions[i].id}
-        setContent={this.setContent}
-        answers={this.state.answers}
-      />);
-    }
-
-    for (let i = 0; i < this.state.answers.length; i++) {
-      answer_options.push(<Answer
-        id={this.state.answers[i].id}
-        changeAnswerLabel={this.changeAnswerLabel}
-      />);
-    }
-
-
     return (
       <div className="component editHeader">
         <h2>{i18n.settings}</h2>
@@ -370,19 +320,31 @@ class Quiz extends React.Component {
               <label>{i18n.answers}: </label>
             </td>
             <td>
-              {answer_options}
+              {this.props.answers.map((item, i) => (
+                <Answer
+                  id={item.id}
+                  changeAnswerLabel={this.changeAnswerLabel}
+                  label={item.label}
+                />
+              ))}
               <button
                 onClick={e => this.addAnswer(e)}
                 style={{position: 'absolute', right: '35', marginTop: '-50'}}
-              >Add answer option
+              >{i18n.answer_btn}
               </button>
             </td>
           </tr>
           </tbody>
         </table>
-        <div className="list-add-element" onClick={e => this.addQuestion(e)} style={{marginTop: '20px'}}>
+        <div
+          className="list-add-element" onClick={e => this.addQuestion(e)}
+          style={{marginTop: '20px'}}
+        >
           <span>
-            <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <svg
+              id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+            >
               <path
                 d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"
               />
@@ -393,7 +355,17 @@ class Quiz extends React.Component {
           </span>
           <p>{i18n.add_question}</p>
         </div>
-        {questions}
+        {this.props.questions.map((item, i) => (
+          <Question
+            id={item.id}
+            label={item.label}
+            start_tms={item.start_tms}
+            end_tms={item.end_tms}
+            correct_answer={item.correct_answer}
+            setContent={this.setContent}
+            answers={this.props.answers}
+          />
+        ))}
       </div>
     );
   }

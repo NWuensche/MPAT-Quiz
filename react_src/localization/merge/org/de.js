@@ -454,6 +454,22 @@ const de = {
     showNavBar: 'Anzeige der Navigation',
     stopAfterDeselecting: 'Stoppe wenn die Komponente nicht mehr ausgewählt ist'
   },
+  quiz: {
+    settings: 'Quiz Einstellungen',
+    answers: 'Antwort Optionen',
+    answer_btn: 'Neue Antwort hinzufügen',
+    answer_label: 'Label',
+    add_question: 'Weitere Frage hinzufügen',
+    ttAddAnswer: 'Label für neue Antwortoption hinzufügen',
+    title: 'BEZEICHNUNG',
+    start_tms: 'START',
+    end_tms: 'ENDE',
+    sec: 'sek',
+    correct_answer: 'RICHTIGE ANTWORT',
+    deleteOption: 'Löschen',
+    ttDeleteOption: 'Lösche Antwortoption'
+
+  },
   timeline: {
     title: 'Timeline',
     range: 'Bereich',
