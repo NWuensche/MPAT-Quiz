@@ -49,9 +49,9 @@ class QuizContent extends React.Component {
           ...prevState,
           timeEnterOver: true, // Can't enter a button anymore
         }));
-		if (this.state.correct == this.state.enteredButton) {
-			this.setState({score: this.state.score + 1});
-		}
+        if (this.state.correct == this.state.enteredButton) {
+          this.setState({score: this.state.score + 1});
+        }
       }, question.end_tms * 1000)
     ));
   }
@@ -59,24 +59,7 @@ class QuizContent extends React.Component {
   componentWillUnmount() {
     unregisterHandlers(this);
   }
-/*  
-  updateScore() {
-    let {score} = this.state;
-    if (this.state.correct === this.state.enteredButton) {
-      ++score;
-    }
-    this.setState({score});
-  }
-  
 
-  updateScore() {
-	if (this.state.correct == this.state.enteredButton) {
-      this.setState({score: this.state.score + 1});
-    }
-  }
-  
-  */
-  
   // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
   newMod(m, n) {
     return ((m % n) + n) % n;
@@ -85,7 +68,7 @@ class QuizContent extends React.Component {
   up() {
     // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
     if (this.state.enteredButton !== -1 || this.state.timeEnterOver || this.state.currQuestion === -1) {
-        return;
+      return;
     }
 
     const numAnswers = this.props.answers.length;
@@ -98,7 +81,7 @@ class QuizContent extends React.Component {
   down() {
     // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
     if (this.state.enteredButton !== -1 || this.state.timeEnterOver || this.state.currQuestion === -1) {
-        return;
+      return;
     }
 
     const numAnswers = this.props.answers.length;
@@ -111,7 +94,7 @@ class QuizContent extends React.Component {
   enter() {
     // Not allowed to enter button when time's up or before 1st question
     if (this.state.timeEnterOver || this.state.currQuestion === -1) {
-        return;
+      return;
     }
     this.setState(prevState => ({
       ...prevState,
@@ -126,11 +109,21 @@ class QuizContent extends React.Component {
   render() {
     const answers = this.props.answers;
     return (
-      <div style={{fontSize: 'large', backgroundColor: 'white'}}>
-        {/* <QuizScoreContent*/}
-        {/* checkAnswer={this.checkAnswer}*/}
-        {/* />*/}
-        Score: {this.state.score}
+      <div>
+        <p style={{
+          fontSize: 'large',
+          backgroundColor: '#090928',
+          color: 'white'
+        }}>
+          Frage {this.state.currQuestion +1 }
+        </p>
+        <div style={{
+          textAlign: 'right',
+          fontSize: 'large',
+          backgroundColor: '#090928',
+          color: 'white'
+        }}>
+          Score: {this.state.score}</div>
         <div>
           {answers.map((answer, i) => (
             <QuizButton
@@ -140,15 +133,17 @@ class QuizContent extends React.Component {
               dontSelect={this.state.timeEnterOver || this.state.enteredButton !== -1 || this.state.currQuestion === -1} // Time's up or a button already entered or before first question
               updateScore={this.updateScore}
             />
-          ))}
-          entered: {this.state.enteredButton}
-		  correct: {this.state.correct}
-		  <p>Hello</p>
-            { 
-                <OverText
-                    lastQuestionOver = {this.props.questions.length === this.state.currQuestion +1 && this.state.timeEnterOver}
-                />
-            } 
+          ))
+          }
+          {/*entered: {this.state.enteredButton}*/
+          }
+          {/*correct: {this.state.correct}*/
+          }
+          {/*{*/}
+            {/*<OverText*/}
+              {/*lastQuestionOver={this.props.questions.length === this.state.currQuestion + 1 && this.state.timeEnterOver}*/}
+            {/*/>*/}
+          {/*}*/}
         </div>
       </div>
     );
@@ -157,30 +152,34 @@ class QuizContent extends React.Component {
 
 // Show hint that quiz is over when last question is over and time to Enter is also over
 function OverText({lastQuestionOver}) {
-    let text = "";
-    if (lastQuestionOver) {
-        text = "Quiz is Over!"
-    }
-    return( <div>
-                {text}
-            </div>
-    );
+  let text = "";
+  if (lastQuestionOver) {
+    text = "Quiz is Over!"
+  }
+  return ( <div>{text}</div>);
 }
 
 function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false}) {
-  let css;
+  let css = {
+    fontSize: 'large',
+    backgroundColor: '#090928',
+    color: 'white',
+    marginTop: '8px',
+    border: '2px #ddd solid',
+    width: '100%'
+  }
   if (isEntered) {
-    css = {border: '2px #ffa500 solid', margin: '10px', padding: '10x'};
+    css.border = '2px #ffa500 solid';
   } else if (dontSelect) {
-    css = {border: '2px #000 solid', margin: '10px', padding: '10x'};
+    css.border = '2px #000 solid';
   } else if (isSelected) {
-    css = {border: '2px #00f solid', margin: '10px', padding: '10x'};
+    css.border = '2px #00f solid';
   } else {
-    css = {border: '2px #ddd solid', margin: '10px', padding: '10x'};
+    css.border = '2px #ddd solid';
   }
   return (
-    <div style={css}>
-      <button>{item.label}</button>
+    <div>
+      <button style={css}>{item.label}</button>
     </div>
   );
 }
