@@ -162,7 +162,6 @@ function OverText({lastQuestionOver}) {
 function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false}) {
   let css = {
     fontSize: 'large',
-    backgroundColor: '#090928',
     color: 'white',
     marginTop: '8px',
     border: '2px #ddd solid',
@@ -179,7 +178,7 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
   }
   return (
     <div>
-      <button style={css}>{item.label}</button>
+      <button className="quiz-button" style={css}>{item.label}</button>
     </div>
   );
 }
