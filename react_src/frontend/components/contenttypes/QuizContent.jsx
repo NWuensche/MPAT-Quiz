@@ -17,6 +17,7 @@ class QuizContent extends React.Component {
       score: 0,
       correct: -1,
       currQuestion: -1,
+      currVideoTime: 0,
     };
   }
 
@@ -29,6 +30,12 @@ class QuizContent extends React.Component {
     ]));
 
     const questions = this.props.questions;
+      setInterval(() => {
+       this.setState(prevState => ({
+         ...prevState,
+         currVideoTime: prevState.currVideoTime + 1,
+       }));
+      }, 1000);
     // New Question Starts
     questions.map((question, i) => (
       setTimeout(() => {
@@ -124,6 +131,7 @@ class QuizContent extends React.Component {
           color: 'white'
         }}>
           Score: {this.state.score}</div>
+          Time: {this.state.currVideoTime}
         <div>
           {answers.map((answer, i) => (
             <QuizButton
