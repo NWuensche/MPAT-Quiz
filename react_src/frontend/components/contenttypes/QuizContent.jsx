@@ -19,6 +19,7 @@ class QuizContent extends React.Component {
       currQuestion: -1,
       currVideoTime: 0,
       times: [], // [Start1, End1, Start2,...] of Questions in ms
+      timesCurrIndex: -1 //1 -> Between End1 and Start2
     };
   }
 
@@ -31,43 +32,58 @@ class QuizContent extends React.Component {
     ]));
 
     const questions = this.props.questions;
+      // Start Timer
       setInterval(() => {
        this.setState(prevState => ({
          ...prevState,
-         currVideoTime: prevState.currVideoTime + 1,
+         currVideoTime: prevState.currVideoTime + 1000, //in ms
        }));
       }, 1000);
+
+      //Check if behind new time
+      setInterval(() => {
+          let a;
+          const currIndex = this.state.timesCurrIndex;
+          const times = this.state.times;
+          const positionVideo = this.state.currVideoTime;
+
+          if (currIndex !== times.length - 1) {// Not Last Question is over
+              if (positionVideo >= times[currIndex + 1]){ // Next Question started or last ended
+                  if (this.newMod(currIndex, 2) === 1) { // Start next Question 
+                      const nextQuestionIndex = Math.floor(currIndex/2) + 1;
+                      const nextQuestion = this.props.questions[nextQuestionIndex];
+                      this.setState(prevState => ({
+                        ...prevState,
+                        selectedButton: 0, // Start at A again
+                        enteredButton: -1, // Unlock Buttons for new Question
+                        timeEnterOver: false, // Unlock Buttons for new Question
+                        correct: nextQuestion.correct_answer,
+                        currQuestion: prevState.currQuestion + 1,
+                        timesCurrIndex: prevState.timesCurrIndex + 1,
+                      }));
+                  }
+                  if (this.newMod(currIndex, 2) === 0) { // curr Question ends 
+                      const nextQuestionIndex = Math.floor(currIndex/2) + 1;
+                      const nextQuestion = this.props.questions[nextQuestionIndex];
+                      this.setState(prevState => ({
+                        ...prevState,
+                        timeEnterOver: true, // Can't enter a button anymore
+                        timesCurrIndex: prevState.timesCurrIndex + 1,
+                      }));
+                   if (this.state.correct == this.state.enteredButton) { // Right Button was entered
+                     this.setState({score: this.state.score + 1});
+                   }
+                  }
+            }
+          }
+      }, 1000);
+
      questions.map(question => (
       this.setState(prevState => ({
         ...prevState,
         times: [...prevState.times, question.start_tms * 1000, question.end_tms * 1000],
       }))
      ));
-    // New Question Starts
-    questions.map((question, i) => (
-      setTimeout(() => {
-        this.setState(prevState => ({
-          ...prevState,
-          selectedButton: 0, // Start at A again
-          enteredButton: -1, // Unlock Buttons for new Question
-          timeEnterOver: false, // Unlock Buttons for new Question
-          correct: question.correct_answer,
-          currQuestion: this.state.currQuestion + 1,
-        }));
-      }, question.start_tms * 1000)
-    ));
-    // Question Over
-    questions.map((question, i) => (
-      setTimeout(() => {
-        this.setState(prevState => ({
-          ...prevState,
-          timeEnterOver: true, // Can't enter a button anymore
-        }));
-        if (this.state.correct == this.state.enteredButton) {
-          this.setState({score: this.state.score + 1});
-        }
-      }, question.end_tms * 1000)
-    ));
   }
 
   componentWillUnmount() {
