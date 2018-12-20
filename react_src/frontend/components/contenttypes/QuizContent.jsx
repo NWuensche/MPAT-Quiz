@@ -18,6 +18,7 @@ class QuizContent extends React.Component {
       correct: -1,
       currQuestion: -1,
       currVideoTime: 0,
+      times: [], // [Start1, End1, Start2,...] of Questions in ms
     };
   }
 
@@ -36,6 +37,12 @@ class QuizContent extends React.Component {
          currVideoTime: prevState.currVideoTime + 1,
        }));
       }, 1000);
+     questions.map(question => (
+      this.setState(prevState => ({
+        ...prevState,
+        times: [...prevState.times, question.start_tms * 1000, question.end_tms * 1000],
+      }))
+     ));
     // New Question Starts
     questions.map((question, i) => (
       setTimeout(() => {
