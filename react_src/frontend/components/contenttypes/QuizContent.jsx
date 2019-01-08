@@ -17,9 +17,9 @@ class QuizContent extends React.Component {
       score: 0,
       correct: -1,
       currQuestion: -1,
-      currVideoTime: 0,
-      times: [], // [Start1, End1, Start2,...] of Questions in ms
-      timesCurrIndex: -1 //1 -> Between End1 and Start2
+      playbackTime: 0,
+      timeStamps: [], // [Start1, End1, Start2,...] of Questions in ms
+      lastStampIndex: -1 // e.g. 1 -> Between End1 and Start2
     };
   }
 
@@ -32,68 +32,96 @@ class QuizContent extends React.Component {
     ]));
 
     const questions = this.props.questions;
-      // Start Timer
-      setInterval(() => {
-       this.setState(prevState => ({
-         ...prevState,
-         currVideoTime: prevState.currVideoTime + 1000, //in ms
-       }));
-      }, 1000);
-
-      //Check if behind new time
-      setInterval(() => {
-          let a;
-          const currIndex = this.state.timesCurrIndex;
-          const times = this.state.times;
-          const positionVideo = this.state.currVideoTime;
-
-          if (currIndex !== times.length - 1) {// Not Last Question is over
-              if (positionVideo >= times[currIndex + 1]){ // Next Question started or last ended
-                  if (this.newMod(currIndex, 2) === 1) { // Start next Question 
-                      const nextQuestionIndex = Math.floor(currIndex/2) + 1;
-                      const nextQuestion = this.props.questions[nextQuestionIndex];
-                      this.setState(prevState => ({
-                        ...prevState,
-                        selectedButton: 0, // Start at A again
-                        enteredButton: -1, // Unlock Buttons for new Question
-                        timeEnterOver: false, // Unlock Buttons for new Question
-                        correct: nextQuestion.correct_answer,
-                        currQuestion: prevState.currQuestion + 1,
-                        timesCurrIndex: prevState.timesCurrIndex + 1,
-                      }));
-                  }
-                  if (this.newMod(currIndex, 2) === 0) { // curr Question ends 
-                      const nextQuestionIndex = Math.floor(currIndex/2) + 1;
-                      const nextQuestion = this.props.questions[nextQuestionIndex];
-                      this.setState(prevState => ({
-                        ...prevState,
-                        timeEnterOver: true, // Can't enter a button anymore
-                        timesCurrIndex: prevState.timesCurrIndex + 1,
-                      }));
-                   if (this.state.correct == this.state.enteredButton) { // Right Button was entered
-                     this.setState({score: this.state.score + 1});
-                   }
-                  }
-            }
-          }
-      }, 1000);
 
      questions.map(question => (
       this.setState(prevState => ({
         ...prevState,
-        times: [...prevState.times, question.start_tms * 1000, question.end_tms * 1000],
+        timeStamps: [...prevState.timeStamps, question.start_tms * 1000, question.end_tms * 1000],
       }))
      ));
+      // Start Timer
+      setInterval(() => {
+       this.setState(prevState => ({
+         ...prevState,
+         playbackTime: prevState.playbackTime + 1000, //in ms
+       }));
+      }, 1000);
+
+      // TODO Noch vorher 1x ausführen, da erst bei 1 sec erstes mal ausgeführt?
+      //Check if behind new time
+      setInterval(() => {
+          const lastStampIndex = this.state.lastStampIndex;
+          const timeStamps = this.state.timeStamps;
+          const positionVideo = this.state.playbackTime;
+          const currStampIndex = getCurrTimeStamp(positionVideo, timeStamps);
+
+          // When Stamp jumped to far, the viewer changed the time of the video
+          // So reset possibly given answer and proceed
+         if (lastStampIndex !== currStampIndex && lastStampIndex + 1 !== currStampIndex) {
+                if (insideQuestion(currStampIndex)) { // Jumped into a question
+                    const currQuestionIndex = Math.ceil(currStampIndex/2);
+                    const currQuestion = this.props.questions[currQuestionIndex];
+                    this.setState(prevState => ({
+                      ...prevState,
+                      selectedButton: 0, // Start at A again
+                      enteredButton: -1, // Delete curr answer
+                      timeEnterOver: false, // Unlock Buttons for new Question
+                      correct: currQuestion.correct_answer,
+                      currQuestion: currQuestionIndex,
+                      lastStampIndex: currStampIndex,
+                    }));
+                }
+                 else { // Not jumped into a question
+                    const currQuestionIndex = Math.ceil(currStampIndex/2) - 1;
+                    this.setState(prevState => ({
+                      ...prevState,
+                      enteredButton: -1, // Delete curr answer
+                      timeEnterOver: true, // Can't enter a button anymore
+                      currQuestion: currQuestionIndex,
+                      lastStampIndex: currStampIndex,
+                    }));
+        }
+         }
+    else {
+         if (lastStampIndex !== timeStamps.length - 1) {//Last Question isn't over
+             if (positionVideo >= timeStamps[lastStampIndex + 1]){ // Next Question started or last ended
+                 if (!insideQuestion(lastStampIndex)) { // Next Question started
+                     const nextQuestionIndex = Math.floor(lastStampIndex/2) + 1;
+                     const nextQuestion = this.props.questions[nextQuestionIndex];
+                     this.setState(prevState => ({
+                       ...prevState,
+                       selectedButton: 0, // Start at A again
+                       enteredButton: -1, // Unlock Buttons for new Question
+                       timeEnterOver: false, // Unlock Buttons for new Question
+                       correct: nextQuestion.correct_answer,
+                       currQuestion: prevState.currQuestion + 1,
+                       lastStampIndex: prevState.lastStampIndex + 1,
+                     }));
+                 }
+                 else { // curr Question ended
+                     const nextQuestionIndex = Math.floor(lastStampIndex/2) + 1;
+                     const nextQuestion = this.props.questions[nextQuestionIndex];
+                     this.setState(prevState => ({
+                       ...prevState,
+                       timeEnterOver: true, // Can't enter a button anymore
+                       lastStampIndex: prevState.lastStampIndex + 1,
+                     }));
+                  if (this.state.correct == this.state.enteredButton) { // Right Button was entered
+                    this.setState({score: this.state.score + 1});
+                  }
+                 }
+           }
+         }
+    }
+      }, 1000);
+
   }
 
   componentWillUnmount() {
     unregisterHandlers(this);
   }
 
-  // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
-  newMod(m, n) {
-    return ((m % n) + n) % n;
-  }
+
 
   up() {
     // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
@@ -104,7 +132,7 @@ class QuizContent extends React.Component {
     const numAnswers = this.props.answers.length;
     this.setState(prevState => ({
       ...prevState,
-      selectedButton: this.newMod((prevState.selectedButton - 1), numAnswers)
+      selectedButton: newMod((prevState.selectedButton - 1), numAnswers)
     }));
   }
 
@@ -117,7 +145,7 @@ class QuizContent extends React.Component {
     const numAnswers = this.props.answers.length;
     this.setState(prevState => ({
       ...prevState,
-      selectedButton: this.newMod((prevState.selectedButton + 1), numAnswers)
+      selectedButton: newMod((prevState.selectedButton + 1), numAnswers)
     }));
   }
 
@@ -154,7 +182,7 @@ class QuizContent extends React.Component {
           color: 'white'
         }}>
           Score: {this.state.score}</div>
-          Time: {this.state.currVideoTime}
+          Time: {this.state.playbackTime}
         <div>
           {answers.map((answer, i) => (
             <QuizButton
@@ -227,6 +255,30 @@ class QuizScoreContent extends React.Component {
       <div>Score: {this.state.score}</div>
     );
   }
+}
+
+// Fix that -1 % 4 == -1 , newMod(-1,4) == 3
+function newMod(m, n) {
+    return ((m % n) + n) % n;
+}
+
+// returns true if given stamp is between start and end time stamp of a question
+// which is equivalent to index of stamp is odd
+function insideQuestion(stampIndex) {
+    if (newMod(stampIndex, 2) === 0) {
+        return true;
+    }
+    return false;
+}
+  // return the last timeStamp which the current time passed. Could change when playing a video.
+function getCurrTimeStamp(currTime, timeStamps) {
+    var i;
+    for (i = 0; i < timeStamps.length; i++) {
+        if (timeStamps[i] > currTime) {
+            break;
+        }
+    }
+    return i - 1; // decrease because first stamp is 0, not 1
 }
 
 componentLoader.registerComponent('quiz', {view: QuizContent}, {
