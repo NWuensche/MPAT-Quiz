@@ -13,13 +13,14 @@ class QuizContent extends React.Component {
     this.state = {
       selectedButton: 0,
       enteredButton: -1, // -1 = nothing entered, i = Button i selected
+      enteredBeforeGuest: false, // extra points when doing so
       timeEnterOver: false,
       score: 0,
       correct: -1,
       currQuestion: -1,
       playbackTime: 0,
-      timeStamps: [], // [Start1, End1, Start2,...] of Questions in s
-      lastStampIndex: -1, // e.g. 1 -> Between End1 and Start2
+      timeStamps: [], // [Start1, Guest1, End1, Start2,...] of Questions in s
+      lastStampIndex: -1, // e.g. 1 -> Between Guest1 and End1
     };
   }
 
@@ -36,7 +37,7 @@ class QuizContent extends React.Component {
      questions.map(question => (
       this.setState(prevState => ({
         ...prevState,
-        timeStamps: [...prevState.timeStamps, question.start_tms, question.end_tms],
+        timeStamps: [...prevState.timeStamps, question.start_tms, question.guest_tms, question.end_tms],
       }))
      ));
       // Start Timer
@@ -59,19 +60,24 @@ class QuizContent extends React.Component {
          if (currStampIndex !== lastStampIndex) {
               // When Stamp jumped to far, then the viewer changed the time of the video
               // So reset possibly given answer and proceed
-             if (jumpedInsideVideo(lastStampIndex, currStampIndex)) {
+             if (jumpedInVideo(lastStampIndex, currStampIndex)) {
                  const newState = freeButtons(this.state);
                  this.setState(newState);
              }
 
                   if(insideQuestion(currStampIndex)) {
-                    const newState = setStateEnteredQuestion(currStampIndex, this.state, questions);
+                    const newState = setStateEnteredQuestion(lastStampIndex, currStampIndex, this.state, questions);
                     this.setState(newState);
                   }
              else { // Left Question
                  // First Check if answer is right
                   if (this.state.correct == this.state.enteredButton && this.state.correct !== -1) { // Right Button was entered and we are not in build up state
-                    this.setState({score: this.state.score + 1});
+                      if (this.state.enteredBeforeGuest) {
+                            this.setState({score: this.state.score + 2}); // Extra points for answering fast
+                      }
+                      else {
+                            this.setState({score: this.state.score + 1});
+                      }
                   }
 
                     const newState = setStateLeftQuestion(currStampIndex, this.state, questions);
@@ -124,9 +130,15 @@ class QuizContent extends React.Component {
     if (this.state.timeEnterOver || this.state.currQuestion === -1) {
       return;
     }
+      if (answeredBeforeGuests(this.state.lastStampIndex)) {
+        this.setState(prevState => ({
+          ...prevState,
+          enteredBeforeGuest: true,
+        }));
+      }
     this.setState(prevState => ({
       ...prevState,
-      enteredButton: prevState.selectedButton
+      enteredButton: prevState.selectedButton,
     }));
   }
 
@@ -182,8 +194,15 @@ class QuizContent extends React.Component {
 // When you watch the video in a linear fashion, two things can happen with the Indices from the last second and the current second
 // Case 1: Indices are the same; Case 2: currIndex is one bigger than lastIndex because new Question started/ended
 // If none of these cases applies, the viewer jumped inside the video
-function jumpedInsideVideo(lastIndex, currIndex) {
+function jumpedInVideo(lastIndex, currIndex) {
     return ((lastIndex !== currIndex) && (lastIndex + 1 !== currIndex))
+}
+
+function answeredBeforeGuests(lastStampIndex) {
+    if (newMod(lastStampIndex, 3) === 0) {
+        return true;
+    }
+    return false;
 }
 
 // Show hint that quiz is over when last question is over and time to Enter is also over
@@ -242,7 +261,7 @@ function newMod(m, n) {
 // returns true if given stamp is between start and end time stamp of a question
 // which is equivalent to index of stamp is odd
 function insideQuestion(stampIndex) {
-    if (newMod(stampIndex, 2) === 0) {
+    if (newMod(stampIndex, 3) === 0 || newMod(stampIndex, 3) === 1) {
         return true;
     }
     return false;
@@ -268,13 +287,17 @@ function freeButtons(prevState) {
  
 }
 //change the state when a new question started or I jumped into another question
-function setStateEnteredQuestion(currStampIndex, prevState, questions) {
-                   const currQuestionIndex = Math.ceil(currStampIndex/2);
-                    const currQuestion = questions[currQuestionIndex];
+function setStateEnteredQuestion(lastStampIndex, currStampIndex, prevState, questions) {
+                  const currQuestionIndex = Math.floor(currStampIndex/3);
+                  const currQuestion = questions[currQuestionIndex];
+                  if(newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
+                      return prevState; //TODO Das nach außen ziehen
+                  } // Don't need to change State if we're switched from before guests to after guests 
                   const newState = {
                       ...prevState,
                       selectedButton: 0, // Start at A again
                       enteredButton: -1, // Delete curr answer
+                      enteredBeforeGuest: false, // Hasn't entered yet
                       timeEnterOver: false, // Unlock Buttons for new Question
                       correct: currQuestion.correct_answer,
                       currQuestion: currQuestionIndex,
@@ -283,9 +306,10 @@ function setStateEnteredQuestion(currStampIndex, prevState, questions) {
 }
 
 function setStateLeftQuestion(currStampIndex, prevState, questions) {
-                    const currQuestionIndex = Math.ceil(currStampIndex/2) - 1;
+                    const currQuestionIndex = Math.floor(currStampIndex/3);
                     const newState = {
                       ...prevState,
+                      enteredBeforeGuest: false,
                       timeEnterOver: true, // Can't enter a button anymore
                       currQuestion: currQuestionIndex, // Could change when jumping
                     };

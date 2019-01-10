@@ -378,7 +378,7 @@ const en = {
     ttAddAnswer: 'Add a new label for an answer option',
     title: 'TITLE',
     start_tms: 'STARTS AT',
-    guest_tms: 'GUESTS ANSWER AT',
+    guest_tms: 'GUEST ANSWER AT',
     end_tms: 'ENDS AT',
     sec: 'sec',
     correct_answer: 'CORRECT ANSWER',
