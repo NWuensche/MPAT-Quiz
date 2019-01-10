@@ -98,6 +98,7 @@ function createDefaultAnswer() {
 const questionType = Types.shape(
   {
     start_tms: Types.string,
+    guest_tms: Types.string,
     end_tms: Types.bool,
     id: Types.string,
     label: Types.string,
@@ -206,6 +207,18 @@ class Question extends React.Component {
                   type="number"
                   value={this.props.start_tms}
                   onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
+                /> {i18n.sec}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {i18n.guest_tms}
+              </td>
+              <td>
+                <input
+                  type="number"
+                  value={this.props.guest_tms}
+                  onChange={e => this.props.setContent(this.props.id, 'guest_tms', e.target.value)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -360,6 +373,7 @@ class Quiz extends React.Component {
             id={item.id}
             label={item.label}
             start_tms={item.start_tms}
+            guest_tms={item.guest_tms}
             end_tms={item.end_tms}
             correct_answer={item.correct_answer}
             setContent={this.setContent}
