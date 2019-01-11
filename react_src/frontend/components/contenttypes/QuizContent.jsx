@@ -28,6 +28,10 @@ class QuizContent extends React.Component {
     // Register Key Handlers
     registerHandlers(this, handlersWithTag('active', [
       createHandler(KeyEvent.VK_UP, this.up.bind(this)),
+      createHandler(KeyEvent.VK_1, this.shortcutEnter.bind(this, 0)),
+      createHandler(KeyEvent.VK_2, this.shortcutEnter.bind(this, 1)),
+      createHandler(KeyEvent.VK_3, this.shortcutEnter.bind(this, 2)),
+      createHandler(KeyEvent.VK_4, this.shortcutEnter.bind(this, 3)),
       createHandler(KeyEvent.VK_DOWN, this.down.bind(this)),
       createHandler(KeyEvent.VK_ENTER, this.enter.bind(this))
     ]));
@@ -139,6 +143,31 @@ class QuizContent extends React.Component {
     this.setState(prevState => ({
       ...prevState,
       enteredButton: prevState.selectedButton,
+    }));
+  }
+
+  // e.g. first answer shortcut -> entered = 0
+  shortcutEnter(entered) {
+    // Not allowed to enter button when time's up or before 1st question
+    if (this.state.timeEnterOver || this.state.currQuestion === -1) {
+      return;
+    }
+
+    //Don't shortcut enter answer if the quiz doesn't have so many choices
+    const numAnswers = this.props.answers.length;
+    if (numAnswers < entered + 1) {
+        return;
+    }
+
+      if (answeredBeforeGuests(this.state.lastStampIndex)) {
+        this.setState(prevState => ({
+          ...prevState,
+          enteredBeforeGuest: true,
+        }));
+      }
+    this.setState(prevState => ({
+      ...prevState,
+      enteredButton: entered
     }));
   }
 
