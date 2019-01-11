@@ -202,6 +202,8 @@ class QuizContent extends React.Component {
               isEntered={i === this.state.enteredButton}
               dontSelect={this.state.timeEnterOver || this.state.enteredButton !== -1 || this.state.currQuestion === -1} // Time's up or a button already entered or before first question
               updateScore={this.updateScore}
+              isRight={i == this.state.correct && this.state.timeEnterOver}
+              enteredWrong={i != this.state.correct && this.state.timeEnterOver && i === this.state.enteredButton }
             />
           ))
           }
@@ -243,7 +245,7 @@ function OverText({lastQuestionOver}) {
   return ( <div>{text}</div>);
 }
 
-function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false}) {
+function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false, isRight = false, enteredWrong = false}) {
   let css = {
     fontSize: 'large',
     color: 'white',
@@ -251,7 +253,11 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
     border: '2px #ddd solid',
     width: '100%'
   }
-  if (isEntered) {
+  if (isRight) {
+    css.border = '2px #0f0 solid';
+  } else if (enteredWrong) {
+    css.border = '2px #f00 solid';
+  } else if (isEntered) {
     css.border = '2px #ffa500 solid';
   } else if (dontSelect) {
     css.border = '2px #000 solid';
