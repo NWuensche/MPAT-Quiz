@@ -37,71 +37,30 @@ class QuizContent extends React.Component {
     ]));
 
     const questions = this.props.questions;
-
-     questions.map(question => (
+    questions.map(question => (
       this.setState(prevState => ({
         ...prevState,
         timeStamps: [...prevState.timeStamps, question.start_tms, question.guest_tms, question.end_tms],
       }))
      ));
-      // Start Timer
-      setInterval(() => {
-        this.setState(prevState => ({
-            ...prevState,
-            playbackTime: prevState.playbackTime + 1,
-         }));
-      }, 1000);
 
-      // TODO Noch vorher 1x ausführen, da erst bei 1 sec erstes mal ausgeführt?
-      //Check if behind new time
-      setInterval(() => {
-          const lastStampIndex = this.state.lastStampIndex;
-          const timeStamps = this.state.timeStamps;
-          const positionVideo = this.state.playbackTime;
-          const currStampIndex = getCurrTimeStamp(positionVideo, timeStamps);
-          const questions = this.props.questions;
+    // Start Timer
+    setInterval(() => {
+      this.setState(prevState => ({
+        ...prevState,
+        playbackTime: prevState.playbackTime + 1,
+      }));
+    }, 1000);
 
-         if (currStampIndex !== lastStampIndex) {
-              // When Stamp jumped to far, then the viewer changed the time of the video
-              // So reset possibly given answer and proceed
-             if (jumpedInVideo(lastStampIndex, currStampIndex)) {
-                 const newState = freeButtons(this.state);
-                 this.setState(newState);
-             }
-
-                  if(insideQuestion(currStampIndex)) {
-                    const newState = setStateEnteredQuestion(lastStampIndex, currStampIndex, this.state, questions);
-                    this.setState(newState);
-                  }
-             else { // Left Question
-                 // First Check if answer is right
-                  if (this.state.correct == this.state.enteredButton && this.state.correct !== -1) { // Right Button was entered and we are not in build up state
-                      if (this.state.enteredBeforeGuest) {
-                            this.setState({score: this.state.score + 2}); // Extra points for answering fast
-                      }
-                      else {
-                            this.setState({score: this.state.score + 1});
-                      }
-                  }
-
-                    const newState = setStateLeftQuestion(currStampIndex, this.state, questions);
-                    this.setState(newState);
-             }
-
-                  this.setState(prevState => ({
-                       ...prevState,
-                      lastStampIndex: currStampIndex,
-                  }));
-         }
-      }, 1000);
-
+    // TODO Noch vorher 1x ausführen, da erst bei 1 sec erstes mal ausgeführt?
+    //Check if behind new time
+    handleTimesAndInputs.call(this);
+    setInterval(handleTimesAndInputs.bind(this), 1000);
   }
 
   componentWillUnmount() {
     unregisterHandlers(this);
   }
-
-
 
   up() {
     // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
@@ -134,12 +93,13 @@ class QuizContent extends React.Component {
     if (this.state.timeEnterOver || this.state.currQuestion === -1) {
       return;
     }
-      if (answeredBeforeGuests(this.state.lastStampIndex)) {
-        this.setState(prevState => ({
-          ...prevState,
-          enteredBeforeGuest: true,
-        }));
-      }
+
+    if (answeredBeforeGuests(this.state.lastStampIndex)) {
+      this.setState(prevState => ({
+        ...prevState,
+        enteredBeforeGuest: true,
+      }));
+    }
     this.setState(prevState => ({
       ...prevState,
       enteredButton: prevState.selectedButton,
@@ -156,23 +116,19 @@ class QuizContent extends React.Component {
     //Don't shortcut enter answer if the quiz doesn't have so many choices
     const numAnswers = this.props.answers.length;
     if (numAnswers < entered + 1) {
-        return;
+      return;
     }
 
-      if (answeredBeforeGuests(this.state.lastStampIndex)) {
-        this.setState(prevState => ({
-          ...prevState,
-          enteredBeforeGuest: true,
-        }));
-      }
+    if (answeredBeforeGuests(this.state.lastStampIndex)) {
+      this.setState(prevState => ({
+        ...prevState,
+        enteredBeforeGuest: true,
+      }));
+    }
     this.setState(prevState => ({
       ...prevState,
       enteredButton: entered
     }));
-  }
-
-  checkAnswer() {
-
   }
 
   render() {
@@ -226,14 +182,14 @@ class QuizContent extends React.Component {
 // Case 1: Indices are the same; Case 2: currIndex is one bigger than lastIndex because new Question started/ended
 // If none of these cases applies, the viewer jumped inside the video
 function jumpedInVideo(lastIndex, currIndex) {
-    return ((lastIndex !== currIndex) && (lastIndex + 1 !== currIndex))
+  return ((lastIndex !== currIndex) && (lastIndex + 1 !== currIndex))
 }
 
 function answeredBeforeGuests(lastStampIndex) {
-    if (newMod(lastStampIndex, 3) === 0) {
-        return true;
-    }
-    return false;
+  if (newMod(lastStampIndex, 3) === 0) {
+    return true;
+  }
+  return false;
 }
 
 // Show hint that quiz is over when last question is over and time to Enter is also over
@@ -290,65 +246,106 @@ class QuizScoreContent extends React.Component {
 
 // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
 function newMod(m, n) {
-    return ((m % n) + n) % n;
+  return ((m % n) + n) % n;
 }
 
 // returns true if given stamp is between start and end time stamp of a question
 // which is equivalent to index of stamp is odd
 function insideQuestion(stampIndex) {
-    if (newMod(stampIndex, 3) === 0 || newMod(stampIndex, 3) === 1) {
-        return true;
-    }
-    return false;
+  if (newMod(stampIndex, 3) === 0 || newMod(stampIndex, 3) === 1) {
+    return true;
+  }
+  return false;
 }
   // return the last timeStamp which the current time passed. Could change when playing a video.
 function getCurrTimeStamp(currTime, timeStamps) {
-    var i;
-    for (i = 0; i < timeStamps.length; i++) {
-        if (timeStamps[i] > currTime) {
-            break;
-        }
+  var i;
+  for (i = 0; i < timeStamps.length; i++) {
+    if (timeStamps[i] > currTime) {
+      break;
     }
-    return i - 1; // decrease because first stamp is 0, not 1
+  }
+  return i - 1; // decrease because first stamp is 0, not 1
 }
 
 // When viewer jumped in video, free all buttons
 function freeButtons(prevState) {
-    const newState = {
-                      ...prevState,
-                      enteredButton: -1,
-                    };
-    return newState;
- 
+  const newState = {
+    ...prevState,
+    enteredButton: -1,
+  };
+  return newState;
 }
+
 //change the state when a new question started or I jumped into another question
 function setStateEnteredQuestion(lastStampIndex, currStampIndex, prevState, questions) {
-                  const currQuestionIndex = Math.floor(currStampIndex/3);
-                  const currQuestion = questions[currQuestionIndex];
-                  if(newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
-                      return prevState; //TODO Das nach außen ziehen
-                  } // Don't need to change State if we're switched from before guests to after guests 
-                  const newState = {
-                      ...prevState,
-                      selectedButton: 0, // Start at A again
-                      enteredButton: -1, // Delete curr answer
-                      enteredBeforeGuest: false, // Hasn't entered yet
-                      timeEnterOver: false, // Unlock Buttons for new Question
-                      correct: currQuestion.correct_answer,
-                      currQuestion: currQuestionIndex,
-                    };
-                 return newState;
+  const currQuestionIndex = Math.floor(currStampIndex/3);
+  const currQuestion = questions[currQuestionIndex];
+  if(newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
+      return prevState; //TODO Das nach außen ziehen
+  } // Don't need to change State if we're switched from before guests to after guests 
+  const newState = {
+      ...prevState,
+      selectedButton: 0, // Start at A again
+      enteredButton: -1, // Delete curr answer
+      enteredBeforeGuest: false, // Hasn't entered yet
+      timeEnterOver: false, // Unlock Buttons for new Question
+      correct: currQuestion.correct_answer,
+      currQuestion: currQuestionIndex,
+    };
+  return newState;
 }
 
 function setStateLeftQuestion(currStampIndex, prevState, questions) {
-                    const currQuestionIndex = Math.floor(currStampIndex/3);
-                    const newState = {
-                      ...prevState,
-                      enteredBeforeGuest: false,
-                      timeEnterOver: true, // Can't enter a button anymore
-                      currQuestion: currQuestionIndex, // Could change when jumping
-                    };
-    return newState;
+  const currQuestionIndex = Math.floor(currStampIndex/3);
+  const newState = {
+    ...prevState,
+    enteredBeforeGuest: false,
+    timeEnterOver: true, // Can't enter a button anymore
+    currQuestion: currQuestionIndex, // Could change when jumping
+  };
+  return newState;
+}
+
+function handleTimesAndInputs() {
+  const lastStampIndex = this.state.lastStampIndex;
+  const timeStamps = this.state.timeStamps;
+  const positionVideo = this.state.playbackTime;
+  const currStampIndex = getCurrTimeStamp(positionVideo, timeStamps);
+  const questions = this.props.questions;
+
+  if (currStampIndex !== lastStampIndex) {
+    // When Stamp jumped to far, then the viewer changed the time of the video
+    // So reset possibly given answer and proceed
+    if (jumpedInVideo(lastStampIndex, currStampIndex)) {
+      const newState = freeButtons(this.state);
+      this.setState(newState);
+    }
+
+    if(insideQuestion(currStampIndex)) {
+      const newState = setStateEnteredQuestion(lastStampIndex, currStampIndex, this.state, questions);
+      this.setState(newState);
+    }
+    else { // Left Question
+      // First Check if answer is right
+      if (this.state.correct == this.state.enteredButton && this.state.correct !== -1) { // Right Button was entered and we are not in build up state
+        if (this.state.enteredBeforeGuest) {
+          this.setState({score: this.state.score + 2}); // Extra points for answering fast
+        }
+        else {
+          this.setState({score: this.state.score + 1});
+        }
+      }
+
+      const newState = setStateLeftQuestion(currStampIndex, this.state, questions);
+        this.setState(newState);
+    }
+
+    this.setState(prevState => ({
+      ...prevState,
+      lastStampIndex: currStampIndex,
+    }));
+  }
 }
 
 componentLoader.registerComponent('quiz', {view: QuizContent}, {
