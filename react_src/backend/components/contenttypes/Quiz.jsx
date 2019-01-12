@@ -104,6 +104,7 @@ const questionType = Types.shape(
     guest_error: Types.bool,
     end_error: Types.bool,
     id: Types.string,
+    number_question: Types.number,
     label: Types.string,
     correct_answer: Types.string
   });
@@ -118,6 +119,7 @@ function createDefaultQuestion() {
     end_error: false,
     label: '',
     id: generateId(),
+    number_question: 0,
     correct_answer: ''
   };
 }
@@ -214,7 +216,7 @@ class Question extends React.Component {
                   type="number"
                   value={this.props.start_tms}
                   style={this.hasError(this.props.start_error)}
-                  onChange={e => this.handleTest(this.props.id, 'start', e)}
+                  onChange={e => this.handleTest(this.props.id, this.props.number_question, 'start', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -227,7 +229,7 @@ class Question extends React.Component {
                   type="number"
                   value={this.props.guest_tms}
                   style={this.hasError(this.props.guest_error)}
-                  onChange={e => this.handleTest(this.props.id, 'guest', e)}
+                  onChange={e => this.handleTest(this.props.id, this.props.number_question, 'guest', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -240,7 +242,7 @@ class Question extends React.Component {
                   type="number"
                   value={this.props.end_tms}
                   style={this.hasError(this.props.end_error)}
-                  onChange={e => this.handleTest(this.props.id, 'end', e)}
+                  onChange={e => this.handleTest(this.props.id, this.props.number_question, 'end', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -274,14 +276,33 @@ class Question extends React.Component {
     );
   }
 
-  handleTest(id, name, e) {
-    this.props.setContent(id, name + "_tms", e.target.value);
+  handleTest(itemId, number_question, name, e) {
+    this.props.setContent(itemId, name + "_tms", e.target.value);
 
-    if (parseInt(e.target.value) === 10) {
-        this.props.setContent(id, name + "_error", true);
-    }
-    else {
-        this.props.setContent(id, name + "_error", false);
+    //CARO
+    let {questions} = this.props;
+    const idx = questions.findIndex(({id}) => id === itemId); // Schmeiß Fehler
+    questions = questions.concat();
+    const question = questions[idx]
+
+
+    const time = parseInt(e.target.value);
+
+    if (name === 'start') {
+      return;
+    } else if (name === 'guest') {
+      if (question['start_tms'] >= time) {
+        this.props.setContent(itemId, name + "_error", true);
+      } else {
+        this.props.setContent(itemId, name + "_error", false);
+      }
+        //TODO Formatierung
+    } else if (name === 'end') {
+      if (question['start_tms'] >= time || question['guest_tms'] >= time) {
+        this.props.setContent(itemId, name + "_error", true);
+      } else {
+        this.props.setContent(itemId, name + "_error", false);
+      }
     }
   }
 
@@ -401,6 +422,7 @@ class Quiz extends React.Component {
         {this.props.questions.map((item, i) => (
           <Question
             id={item.id}
+            number_question={i}
             label={item.label}
             start_tms={item.start_tms}
             guest_tms={item.guest_tms}
