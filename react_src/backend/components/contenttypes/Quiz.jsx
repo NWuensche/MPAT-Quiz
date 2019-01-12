@@ -100,6 +100,9 @@ const questionType = Types.shape(
     start_tms: Types.string,
     guest_tms: Types.string,
     end_tms: Types.bool,
+    start_error: Types.bool,
+    guest_error: Types.bool,
+    end_error: Types.bool,
     id: Types.string,
     label: Types.string,
     correct_answer: Types.string
@@ -108,7 +111,11 @@ const questionType = Types.shape(
 function createDefaultQuestion() {
   return {
     start_tms: null,
+    guest_tms: null,
     end_tms: null,
+    start_error: false,
+    guest_error: false,
+    end_error: false,
     label: '',
     id: generateId(),
     correct_answer: ''
@@ -206,7 +213,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.start_tms}
-                  onChange={e => this.handleTest(this.props.id, 'start_tms', e)}
+                  style={this.hasError(this.props.start_error)}
+                  onChange={e => this.handleTest(this.props.id, 'start', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -218,7 +226,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.guest_tms}
-                  onChange={e => this.handleTest(this.props.id, 'guest_tms', e)}
+                  style={this.hasError(this.props.guest_error)}
+                  onChange={e => this.handleTest(this.props.id, 'guest', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -230,7 +239,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.end_tms}
-                  onChange={e => this.handleTest(this.props.id, 'end_tms', e)}
+                  style={this.hasError(this.props.end_error)}
+                  onChange={e => this.handleTest(this.props.id, 'end', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -265,7 +275,23 @@ class Question extends React.Component {
   }
 
   handleTest(id, name, e) {
-    this.props.setContent(id, name, e.target.value)
+    this.props.setContent(id, name + "_tms", e.target.value);
+
+    if (parseInt(e.target.value) === 10) {
+        this.props.setContent(id, name + "_error", true);
+    }
+    else {
+        this.props.setContent(id, name + "_error", false);
+    }
+  }
+
+  hasError(error) {
+    if(error) {
+      return {
+        boxShadow: '0 0 3px #ff0000'
+      }
+    }
+    return {}
   }
 }
 
@@ -379,6 +405,9 @@ class Quiz extends React.Component {
             start_tms={item.start_tms}
             guest_tms={item.guest_tms}
             end_tms={item.end_tms}
+            start_error={item.start_error}
+            guest_error={item.guest_error}
+            end_error={item.end_error}
             correct_answer={item.correct_answer}
             setContent={this.setContent}
             answers={this.props.answers}
