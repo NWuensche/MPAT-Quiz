@@ -206,7 +206,7 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.start_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
+                  onChange={e => this.handleTest(this.props.id, 'start_tms', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -218,7 +218,7 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.guest_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'guest_tms', e.target.value)}
+                  onChange={e => this.handleTest(this.props.id, 'guest_tms', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -230,7 +230,7 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.end_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'end_tms', e.target.value)}
+                  onChange={e => this.handleTest(this.props.id, 'end_tms', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -262,6 +262,10 @@ class Question extends React.Component {
         {/* </div>*/}
       </div>
     );
+  }
+
+  handleTest(id, name, e) {
+    this.props.setContent(id, name, e.target.value)
   }
 }
 
