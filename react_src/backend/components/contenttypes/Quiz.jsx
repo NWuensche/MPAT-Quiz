@@ -339,31 +339,61 @@ class Quiz extends React.Component {
   handleTest(itemId, number_question, name, e) {
     this.setContent(itemId, `${name}_tms`, e.target.value);
 
-    // CARO
     let { questions } = this.props;
-    const idx = questions.findIndex(({ id }) => id === itemId); // Schmeiß Fehler
+    const idx = questions.findIndex(({ id }) => id === itemId);
     questions = questions.concat();
-    const question = questions[idx];
+    const currQuestion = questions[idx];
 
+    // Handle if one time stamp is smaller than the last one
+    let timeStart = currQuestion.start_tms;
+    let timeGuest = currQuestion.guest_tms;
+    let timeEnd = currQuestion.end_tms;
 
-    const time = parseInt(e.target.value);
+    const changedTime = parseInt(e.target.value);
 
-    if (name === 'start') {
+    switch(name) {
+      case 'start': timeStart = changedTime; break;
+      case 'guest': timeGuest = changedTime; break;
+      case 'end': timeEnd = changedTime; break;
+    }
 
-    } else if (name === 'guest') {
-      if (question.start_tms >= time) {
-        this.setContent(itemId, `${name}_error`, true);
-      } else {
-        this.setContent(itemId, `${name}_error`, false);
-      }
-      // TODO Formatierung
-    } else if (name === 'end') {
-      if (question.start_tms >= time || question.guest_tms >= time) {
-        this.setContent(itemId, `${name}_error`, true);
-      } else {
-        this.setContent(itemId, `${name}_error`, false);
+    if (timeStart >= timeGuest || timeStart >= timeEnd) {
+        this.setContent(itemId, `start_error`, true);
+    } else {
+        this.setContent(itemId, `start_error`, false);
+    }
+
+    if (timeGuest >= timeEnd) {
+        this.setContent(itemId, `guest_error`, true);
+    } else {
+        this.setContent(itemId, `guest_error`, false);
+    }
+
+    // Handle if time stamp is smaller than any the ones in previous questions
+
+    let prevQuestions = []
+    let i;
+    for (i = 0; i < questions.length; i++) {
+      const question = questions[i];
+      if (question.number_question < number_question) { //TODO number_question aus aktueller Frage, nicht als Param
+      prevQuestions.push(questions[i]);
       }
     }
+
+    //TODO, Was, wenn nächste kleiner?
+    let hadError = false;
+    for (i = 0; i < prevQuestions.length; i++) {
+      const question = prevQuestions[i];
+      if (question.end_tms > changedTime) { // Hier doch alle abfragen
+        this.setContent(itemId, `${name}_error`, true);
+        hadError = true;
+        break;
+      }
+    }
+    if (!hadError) {
+        this.setContent(itemId, `${name}_error`, false);
+    }
+
   }
 
   hasError(error) {
