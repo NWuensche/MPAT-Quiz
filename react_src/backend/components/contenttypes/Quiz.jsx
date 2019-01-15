@@ -119,7 +119,7 @@ function createDefaultQuestion() {
     end_error: false,
     label: '',
     id: generateId(),
-    number_question: 0,
+    number_question: 42,
     correct_answer: ''
   };
 }
@@ -343,6 +343,7 @@ class Quiz extends React.Component {
     const idx = questions.findIndex(({ id }) => id === itemId);
     questions = questions.concat();
     const currQuestion = questions[idx];
+//    let number_question2 = currQuestion['number_question']; geht
 
     // Handle if one time stamp is smaller than the last one
     let timeStart = currQuestion.start_tms;
@@ -371,28 +372,38 @@ class Quiz extends React.Component {
 
     // Handle if time stamp is smaller than any the ones in previous questions
 
+    let i = [] ;
     let prevQuestions = []
-    let i;
-    for (i = 0; i < questions.length; i++) {
-      const question = questions[i];
-      if (question.number_question < number_question) { //TODO number_question aus aktueller Frage, nicht als Param
-      prevQuestions.push(questions[i]);
-      }
-    }
+    //        this.setContent(itemId, 'label', questions.length);
+//    questions.forEach(ele => {
+//      if (ele.number_question < number_question2) { //todo number_question aus aktueller frage, nicht als param
+ //       prevQuestions.push(ele);
+  //    }
+//      i.push(ele.end_tms);
+ //   });
+
+      prevQuestions = questions.slice(0, idx);
+      prevQuestions.forEach(ele => {
+        if (parseInt(ele.start_tms) > changedTime || parseInt(ele.guest_tms) > changedTime || parseInt(ele.end_tms) > changedTime) {
+           this.setContent(itemId, `${name}_error`, true);
+        }
+      });
+
+//        this.setContent(itemId, 'label', number_question2);
 
     //TODO, Was, wenn nächste kleiner?
     let hadError = false;
-    for (i = 0; i < prevQuestions.length; i++) {
-      const question = prevQuestions[i];
-      if (question.end_tms > changedTime) { // Hier doch alle abfragen
-        this.setContent(itemId, `${name}_error`, true);
-        hadError = true;
-        break;
-      }
-    }
-    if (!hadError) {
-        this.setContent(itemId, `${name}_error`, false);
-    }
+//   for (i = 0; i < prevQuestions.length; i++) {
+//     const question = prevQuestions[i];
+//     if (question.end_tms > changedTime) { // Hier doch alle abfragen
+//       this.setContent(itemId, `${name}_error`, true);
+//       //        hadError = true;
+//       break;
+//     }
+//   }
+    //if (!hadError) {
+     //   this.setContent(itemId, `${name}_error`, false);
+    //}
 
   }
 
@@ -454,7 +465,7 @@ class Quiz extends React.Component {
         {this.props.questions.map((item, i) => (
           <Question
             id={item.id}
-            number_question={i}
+            number_question={13}
             label={item.label}
             start_tms={item.start_tms}
             guest_tms={item.guest_tms}
