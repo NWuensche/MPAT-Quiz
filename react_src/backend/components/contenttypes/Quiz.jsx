@@ -372,8 +372,6 @@ class Quiz extends React.Component {
 
     // Handle if time stamp is smaller than any the ones in previous questions
 
-    let i = [] ;
-    let prevQuestions = []
     //        this.setContent(itemId, 'label', questions.length);
 //    questions.forEach(ele => {
 //      if (ele.number_question < number_question2) { //todo number_question aus aktueller frage, nicht als param
@@ -382,17 +380,22 @@ class Quiz extends React.Component {
 //      i.push(ele.end_tms);
  //   });
 
-      prevQuestions = questions.slice(0, idx);
+    this.setContent(itemId, `${name}_error`, false); // Only set it true if currently error
+      const prevQuestions = questions.slice(0, idx);
       prevQuestions.forEach(ele => {
-        if (parseInt(ele.start_tms) > changedTime || parseInt(ele.guest_tms) > changedTime || parseInt(ele.end_tms) > changedTime) {
+        if (parseInt(ele.start_tms) >= changedTime || parseInt(ele.guest_tms) >= changedTime || parseInt(ele.end_tms) >= changedTime) {
            this.setContent(itemId, `${name}_error`, true);
         }
       });
 
 //        this.setContent(itemId, 'label', number_question2);
 
-    //TODO, Was, wenn nächste kleiner?
-    let hadError = false;
+     const nextQuestions = questions.slice(idx+1); //All after currQuestion
+      nextQuestions.forEach(ele => {
+        if (changedTime >= parseInt(ele.start_tms) || changedTime >= parseInt(ele.guest_tms) || changedTime >= parseInt(ele.end_tms) ) {
+           this.setContent(itemId, `${name}_error`, true);
+        }
+      });
 //   for (i = 0; i < prevQuestions.length; i++) {
 //     const question = prevQuestions[i];
 //     if (question.end_tms > changedTime) { // Hier doch alle abfragen
