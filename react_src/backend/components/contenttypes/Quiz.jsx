@@ -361,52 +361,59 @@ class Quiz extends React.Component {
       case 'end': timeEnd = changedTime; break;
     }
 
-    if (timeStart >= timeGuest || timeStart >= timeEnd) {
+
+
+    if (timeGuest != null && timeStart >= timeGuest) {
+        this.setContent(itemId, `start_error`, true);
+    } else if (timeEnd != null && timeStart >= timeEnd) {
         this.setContent(itemId, `start_error`, true);
     } else {
         this.setContent(itemId, `start_error`, false);
     }
 
-    if (timeGuest >= timeEnd) {
+    if (timeGuest != null && timeEnd != null && timeGuest >= timeEnd) {
         this.setContent(itemId, `guest_error`, true);
     } else {
         this.setContent(itemId, `guest_error`, false);
     }
 
+
+
     // Handle if time stamp is smaller than any the ones in previous questions
 
-    //        this.setContent(itemId, 'label', questions.length);
-//    questions.forEach(ele => {
-//      if (ele.number_question < number_question2) { //todo number_question aus aktueller frage, nicht als param
- //       prevQuestions.push(ele);
-  //    }
-//      i.push(ele.end_tms);
- //   });
+        this.setContent(itemId, `end_error`, false);
+//   this.setContent(itemId, `${name}_error`, false); // Only set it true if currently error TODO Falsch, da erster Fehler ignoriert
+     const prevQuestions = questions.slice(0, idx);
+     prevQuestions.forEach(ele => {
+       const eleStart = parseInt(ele.start_tms)
+       const eleGuest = parseInt(ele.guest_tms)
+       const eleEnd = parseInt(ele.end_tms)
+       if (timeStart !=null && (eleStart >= timeStart || eleGuest >= timeStart || eleEnd >= timeStart)) {
+          this.setContent(itemId, `start_error`, true);
+       }
+       if (timeGuest != null && (eleStart >= timeGuest || eleGuest >= timeGuest || eleEnd >= timeGuest)) {
+          this.setContent(itemId, `guest_error`, true);
+       }
+       if (timeEnd != null && (eleStart >= timeEnd || eleGuest >= timeEnd || eleEnd >= timeEnd)) {
+          this.setContent(itemId, `end_error`, true);
+       }
+     });
 
-    this.setContent(itemId, `${name}_error`, false); // Only set it true if currently error
-      const prevQuestions = questions.slice(0, idx);
-      prevQuestions.forEach(ele => {
-        if (parseInt(ele.start_tms) >= changedTime || parseInt(ele.guest_tms) >= changedTime || parseInt(ele.end_tms) >= changedTime) {
-           this.setContent(itemId, `${name}_error`, true);
-        }
-      });
-
-//        this.setContent(itemId, 'label', number_question2);
-
-     const nextQuestions = questions.slice(idx+1); //All after currQuestion
-      nextQuestions.forEach(ele => {
-        if (changedTime >= parseInt(ele.start_tms) || changedTime >= parseInt(ele.guest_tms) || changedTime >= parseInt(ele.end_tms) ) {
-           this.setContent(itemId, `${name}_error`, true);
-        }
-      });
-//   for (i = 0; i < prevQuestions.length; i++) {
-//     const question = prevQuestions[i];
-//     if (question.end_tms > changedTime) { // Hier doch alle abfragen
-//       this.setContent(itemId, `${name}_error`, true);
-//       //        hadError = true;
-//       break;
-//     }
-//   }
+    const nextQuestions = questions.slice(idx+1); //All after currQuestion
+     nextQuestions.forEach(ele => {
+       const eleStart = parseInt(ele.start_tms)
+       const eleGuest = parseInt(ele.guest_tms)
+       const eleEnd = parseInt(ele.end_tms)
+       if (timeStart != null && (eleStart <= timeStart || eleGuest <= timeStart || eleEnd <= timeStart)) {
+          this.setContent(itemId, `start_error`, true);
+       }
+       if (timeGuest != null && (eleStart <= timeGuest || eleGuest <= timeGuest || eleEnd <= timeGuest)) {
+          this.setContent(itemId, `guest_error`, true);
+       }
+       if (timeEnd != null && (eleStart <= timeEnd || eleGuest <= timeEnd || eleEnd <= timeEnd)) {
+          this.setContent(itemId, `end_error`, true);
+       }
+     });
     //if (!hadError) {
      //   this.setContent(itemId, `${name}_error`, false);
     //}
