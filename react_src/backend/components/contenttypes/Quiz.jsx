@@ -337,7 +337,11 @@ class Quiz extends React.Component {
   }
 
   handleTest(itemId, number_question, name, e) {
-    this.setContent(itemId, `${name}_tms`, e.target.value);
+    const changedTime = parseInt(e.target.value);
+    if (changedTime < 0) {
+      return;
+    }
+    this.setContent(itemId, `${name}_tms`, changedTime);
 
     let { questions } = this.props;
     const idx = questions.findIndex(({ id }) => id === itemId);
@@ -350,7 +354,6 @@ class Quiz extends React.Component {
     let timeGuest = currQuestion.guest_tms;
     let timeEnd = currQuestion.end_tms;
 
-    const changedTime = parseInt(e.target.value);
 
     switch(name) {
       case 'start': timeStart = changedTime; break;
