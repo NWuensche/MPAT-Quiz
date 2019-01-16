@@ -104,7 +104,6 @@ const questionType = Types.shape(
     guest_error: Types.bool,
     end_error: Types.bool,
     id: Types.string,
-    number_question: Types.number,
     label: Types.string,
     correct_answer: Types.string
   });
@@ -119,7 +118,6 @@ function createDefaultQuestion() {
     end_error: false,
     label: '',
     id: generateId(),
-    number_question: 42,
     correct_answer: ''
   };
 }
@@ -215,8 +213,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.start_tms}
-                  style={this.props.hasError(this.props.start_error)}
-                  onChange={e => this.props.handleTest(this.props.id, this.props.number_question, 'start', e)}
+                  style={this.props.stampHasError(this.props.start_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'start', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -228,8 +226,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.guest_tms}
-                  style={this.props.hasError(this.props.guest_error)}
-                  onChange={e => this.props.handleTest(this.props.id, this.props.number_question, 'guest', e)}
+                  style={this.props.stampHasError(this.props.guest_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'guest', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -241,8 +239,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.end_tms}
-                  style={this.props.hasError(this.props.end_error)}
-                  onChange={e => this.props.handleTest(this.props.id, this.props.number_question, 'end', e)}
+                  style={this.props.stampHasError(this.props.end_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'end', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -336,91 +334,114 @@ class Quiz extends React.Component {
     this.props.changeAreaContent({ answers });
   }
 
-  handleTest(itemId, number_question, name, e) {
+
+  handleChangeTimeStamp(itemId, name, e) {
     const changedTime = parseInt(e.target.value);
+
     if (changedTime < 0) {
       return;
     }
+
     this.setContent(itemId, `${name}_tms`, changedTime);
 
     let { questions } = this.props;
     const idx = questions.findIndex(({ id }) => id === itemId);
     questions = questions.concat();
     const currQuestion = questions[idx];
-//    let number_question2 = currQuestion['number_question']; geht
 
-    // Handle if one time stamp is smaller than the last one
+    // Look if still errors for times in the current question
+    this.setContent(itemId, `start_error`, false);
+    this.setContent(itemId, `guest_error`, false);
+    this.setContent(itemId, `end_error`, false);
+
+    
+    // Case 1: Show error if one time stamp is smaller than a previous one in the same question
+    this.lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime);
+
+    // Case 2: Show error if one time stamp is smaller than any one in a previous question
+    const prevQuestions = questions.slice(0, idx);
+    this.lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime);
+
+    // Case 3: Show error if one time stamp is bigger than any one in a next question
+    const nextQuestions = questions.slice(idx+1);
+    this.lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime);
+  }
+
+  getStampsCurrQuestion(name, changedTime, currQuestion) {
     let timeStart = currQuestion.start_tms;
     let timeGuest = currQuestion.guest_tms;
     let timeEnd = currQuestion.end_tms;
-
 
     switch(name) {
       case 'start': timeStart = changedTime; break;
       case 'guest': timeGuest = changedTime; break;
       case 'end': timeEnd = changedTime; break;
     }
+    return {
+      timeStart: timeStart,
+      timeGuest: timeGuest,
+      timeEnd: timeEnd,
+    }
+  }
 
-
+  lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
 
     if (timeGuest != null && timeStart >= timeGuest) {
         this.setContent(itemId, `start_error`, true);
     } else if (timeEnd != null && timeStart >= timeEnd) {
         this.setContent(itemId, `start_error`, true);
-    } else {
-        this.setContent(itemId, `start_error`, false);
     }
 
     if (timeGuest != null && timeEnd != null && timeGuest >= timeEnd) {
         this.setContent(itemId, `guest_error`, true);
-    } else {
-        this.setContent(itemId, `guest_error`, false);
     }
+  }
 
+  lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
 
+     prevQuestions.forEach(question => {
+       const questionStart = parseInt(question.start_tms)
+       const questionGuest = parseInt(question.guest_tms)
+       const questionEnd = parseInt(question.end_tms)
 
-    // Handle if time stamp is smaller than any the ones in previous questions
-
-        this.setContent(itemId, `end_error`, false);
-//   this.setContent(itemId, `${name}_error`, false); // Only set it true if currently error TODO Falsch, da erster Fehler ignoriert
-     const prevQuestions = questions.slice(0, idx);
-     prevQuestions.forEach(ele => {
-       const eleStart = parseInt(ele.start_tms)
-       const eleGuest = parseInt(ele.guest_tms)
-       const eleEnd = parseInt(ele.end_tms)
-       if (timeStart !=null && (eleStart >= timeStart || eleGuest >= timeStart || eleEnd >= timeStart)) {
+       if (timeStart !=null && (questionStart >= timeStart || questionGuest >= timeStart || questionEnd >= timeStart)) {
           this.setContent(itemId, `start_error`, true);
        }
-       if (timeGuest != null && (eleStart >= timeGuest || eleGuest >= timeGuest || eleEnd >= timeGuest)) {
+       if (timeGuest != null && (questionStart >= timeGuest || questionGuest >= timeGuest || questionEnd >= timeGuest)) {
           this.setContent(itemId, `guest_error`, true);
        }
-       if (timeEnd != null && (eleStart >= timeEnd || eleGuest >= timeEnd || eleEnd >= timeEnd)) {
+       if (timeEnd != null && (questionStart >= timeEnd || questionGuest >= timeEnd || questionEnd >= timeEnd)) {
           this.setContent(itemId, `end_error`, true);
        }
-     });
 
-    const nextQuestions = questions.slice(idx+1); //All after currQuestion
-     nextQuestions.forEach(ele => {
-       const eleStart = parseInt(ele.start_tms)
-       const eleGuest = parseInt(ele.guest_tms)
-       const eleEnd = parseInt(ele.end_tms)
-       if (timeStart != null && (eleStart <= timeStart || eleGuest <= timeStart || eleEnd <= timeStart)) {
-          this.setContent(itemId, `start_error`, true);
-       }
-       if (timeGuest != null && (eleStart <= timeGuest || eleGuest <= timeGuest || eleEnd <= timeGuest)) {
-          this.setContent(itemId, `guest_error`, true);
-       }
-       if (timeEnd != null && (eleStart <= timeEnd || eleGuest <= timeEnd || eleEnd <= timeEnd)) {
-          this.setContent(itemId, `end_error`, true);
-       }
      });
-    //if (!hadError) {
-     //   this.setContent(itemId, `${name}_error`, false);
-    //}
 
   }
 
-  hasError(error) {
+  lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+
+     nextQuestions.forEach(question => {
+      const questionStart = parseInt(question.start_tms)
+      const questionGuest = parseInt(question.guest_tms)
+      const questionEnd = parseInt(question.end_tms)
+
+      if (timeStart != null && (questionStart <= timeStart || questionGuest <= timeStart || questionEnd <= timeStart)) {
+        this.setContent(itemId, `start_error`, true);
+      }
+      if (timeGuest != null && (questionStart <= timeGuest || questionGuest <= timeGuest || questionEnd <= timeGuest)) {
+        this.setContent(itemId, `guest_error`, true);
+      }
+      if (timeEnd != null && (questionStart <= timeEnd || questionGuest <= timeEnd || questionEnd <= timeEnd)) {
+        this.setContent(itemId, `end_error`, true);
+      }
+    });
+
+  }
+
+  stampHasError(error) {
     if (error) {
       return {
         boxShadow: '0 0 3px #ff0000'
@@ -478,7 +499,6 @@ class Quiz extends React.Component {
         {this.props.questions.map((item, i) => (
           <Question
             id={item.id}
-            number_question={13}
             label={item.label}
             start_tms={item.start_tms}
             guest_tms={item.guest_tms}
@@ -489,8 +509,8 @@ class Quiz extends React.Component {
             correct_answer={item.correct_answer}
             setContent={this.setContent}
             answers={this.props.answers}
-            handleTest={this.handleTest}
-            hasError={this.hasError}
+            handleChangeTimeStamp={this.handleChangeTimeStamp}
+            stampHasError={this.stampHasError}
           />
         ))}
       </div>
