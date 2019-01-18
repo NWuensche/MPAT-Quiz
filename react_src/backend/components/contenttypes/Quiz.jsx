@@ -25,19 +25,19 @@
  * Marco Ferrari (marco.ferrari@finconsgroup.com)
  *
  **/
-import React, {PropTypes as Types} from 'react';
+import React, { PropTypes as Types } from 'react';
 import autobind from 'class-autobind';
-import {componentLoader} from '../../../ComponentLoader';
-import {noSubmitOnEnter} from '../../utils';
-import {getTooltipped} from '../../tooltipper';
+import { componentLoader } from '../../../ComponentLoader';
+import { noSubmitOnEnter } from '../../utils';
+import { getTooltipped } from '../../tooltipper';
 import Constants from '../../../constants';
-import {generateId} from '../../../functions';
+import { generateId } from '../../../functions';
 
 
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const {id, data, changeAreaContent} = params;
+  const { id, data, changeAreaContent } = params;
   return (
     <Quiz
       id={id}
@@ -60,23 +60,23 @@ function sharedProps() {
   return {
     // updateItem: this.updateItem,
     remoteKeys: [
-      {key: '', label: 'Select Remote Button'},
-      {key: 'VK_0', label: '0', disabled: false},
-      {key: 'VK_1', label: '1', disabled: false},
-      {key: 'VK_2', label: '2', disabled: false},
-      {key: 'VK_3', label: '3', disabled: false},
-      {key: 'VK_4', label: '4', disabled: false},
-      {key: 'VK_5', label: '5', disabled: false},
-      {key: 'VK_6', label: '6', disabled: false},
-      {key: 'VK_7', label: '7', disabled: false},
-      {key: 'VK_8', label: '8', disabled: false},
-      {key: 'VK_9', label: '9', disabled: false},
-      {key: 'VK_RED', label: 'red', disabled: false},
-      {key: 'VK_YELLOW', label: 'yellow', disabled: false},
-      {key: 'VK_GREEN', label: 'green', disabled: false},
-      {key: 'VK_BLUE', label: 'blue', disabled: false},
-      {key: 'VK_BACK', label: 'back', disabled: false},
-      {key: 'VK_OK', label: 'ok', disabled: false}
+      { key: '', label: 'Select Remote Button' },
+      { key: 'VK_0', label: '0', disabled: false },
+      { key: 'VK_1', label: '1', disabled: false },
+      { key: 'VK_2', label: '2', disabled: false },
+      { key: 'VK_3', label: '3', disabled: false },
+      { key: 'VK_4', label: '4', disabled: false },
+      { key: 'VK_5', label: '5', disabled: false },
+      { key: 'VK_6', label: '6', disabled: false },
+      { key: 'VK_7', label: '7', disabled: false },
+      { key: 'VK_8', label: '8', disabled: false },
+      { key: 'VK_9', label: '9', disabled: false },
+      { key: 'VK_RED', label: 'red', disabled: false },
+      { key: 'VK_YELLOW', label: 'yellow', disabled: false },
+      { key: 'VK_GREEN', label: 'green', disabled: false },
+      { key: 'VK_BLUE', label: 'blue', disabled: false },
+      { key: 'VK_BACK', label: 'back', disabled: false },
+      { key: 'VK_OK', label: 'ok', disabled: false }
     ]
   };
 }
@@ -100,6 +100,9 @@ const questionType = Types.shape(
     start_tms: Types.string,
     guest_tms: Types.string,
     end_tms: Types.bool,
+    start_error: Types.bool,
+    guest_error: Types.bool,
+    end_error: Types.bool,
     id: Types.string,
     label: Types.string,
     correct_answer: Types.string
@@ -108,7 +111,11 @@ const questionType = Types.shape(
 function createDefaultQuestion() {
   return {
     start_tms: null,
+    guest_tms: null,
     end_tms: null,
+    start_error: false,
+    guest_error: false,
+    end_error: false,
     label: '',
     id: generateId(),
     correct_answer: ''
@@ -130,12 +137,12 @@ class Answer extends React.Component {
 
   render() {
     return (
-      <div className="answer" style={{display: 'table-cell'}}>
+      <div className="answer" style={{ display: 'table-cell' }}>
         Label<input
-        type="text"
-        value={this.props.label}
-        onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
-      />
+          type="text"
+          value={this.props.label}
+          onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
+        />
       </div>
     );
   }
@@ -206,7 +213,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.start_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'start_tms', e.target.value)}
+                  style={this.props.stampHasError(this.props.start_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'start', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -218,7 +226,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.guest_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'guest_tms', e.target.value)}
+                  style={this.props.stampHasError(this.props.guest_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'guest', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -230,7 +239,8 @@ class Question extends React.Component {
                 <input
                   type="number"
                   value={this.props.end_tms}
-                  onChange={e => this.props.setContent(this.props.id, 'end_tms', e.target.value)}
+                  style={this.props.stampHasError(this.props.end_error)}
+                  onChange={e => this.props.handleChangeTimeStamp(this.props.id, 'end', e)}
                 /> {i18n.sec}
               </td>
             </tr>
@@ -239,9 +249,11 @@ class Question extends React.Component {
                 {i18n.correct_answer}
               </td>
               <td>
-                <select id={this.props.id}
-                        value={this.props.correct_answer}
-                        onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}>
+                <select
+                  id={this.props.id}
+                  value={this.props.correct_answer}
+                  onChange={e => this.props.setContent(this.props.id, 'correct_answer', e.target.value)}
+                >
                   {options}
                 </select>
               </td>
@@ -293,33 +305,149 @@ class Quiz extends React.Component {
 
 
   setContent(itemId, key, value) {
-    let {questions} = this.props;
-    const idx = questions.findIndex(({id}) => id === itemId);
+    let { questions } = this.props;
+    const idx = questions.findIndex(({ id }) => id === itemId);
     questions = questions.concat();
     questions[idx][key] = value;
-    this.props.changeAreaContent({questions});
+    this.props.changeAreaContent({ questions });
   }
 
   addAnswer(e) {
     e.preventDefault();
-    const {answers} = this.props;
+    const { answers } = this.props;
     answers.push(createDefaultAnswer());
-    this.props.changeAreaContent({answers});
+    this.props.changeAreaContent({ answers });
   }
 
   addQuestion(e) {
     e.preventDefault();
-    const {questions} = this.props;
+    const { questions } = this.props;
     questions.push(createDefaultQuestion());
-    this.props.changeAreaContent({questions});
+    this.props.changeAreaContent({ questions });
   }
 
   changeAnswerLabel(itemId, key, value) {
-    let {answers} = this.props;
-    const idx = answers.findIndex(({id}) => id === itemId);
+    let { answers } = this.props;
+    const idx = answers.findIndex(({ id }) => id === itemId);
     answers = answers.concat();
     answers[idx][key] = value;
-    this.props.changeAreaContent({answers});
+    this.props.changeAreaContent({ answers });
+  }
+
+
+  handleChangeTimeStamp(itemId, name, e) {
+    const changedTime = parseInt(e.target.value);
+
+    if (changedTime < 0) {
+      return;
+    }
+
+    this.setContent(itemId, `${name}_tms`, changedTime);
+
+    let { questions } = this.props;
+    const idx = questions.findIndex(({ id }) => id === itemId);
+    questions = questions.concat();
+    const currQuestion = questions[idx];
+
+    // Look if still errors for times in the current question
+    this.setContent(itemId, `start_error`, false);
+    this.setContent(itemId, `guest_error`, false);
+    this.setContent(itemId, `end_error`, false);
+
+    
+    // Case 1: Show error if one time stamp is smaller than a previous one in the same question
+    this.lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime);
+
+    // Case 2: Show error if one time stamp is smaller than any one in a previous question
+    const prevQuestions = questions.slice(0, idx);
+    this.lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime);
+
+    // Case 3: Show error if one time stamp is bigger than any one in a next question
+    const nextQuestions = questions.slice(idx+1);
+    this.lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime);
+  }
+
+  getStampsCurrQuestion(name, changedTime, currQuestion) {
+    let timeStart = currQuestion.start_tms;
+    let timeGuest = currQuestion.guest_tms;
+    let timeEnd = currQuestion.end_tms;
+
+    switch(name) {
+      case 'start': timeStart = changedTime; break;
+      case 'guest': timeGuest = changedTime; break;
+      case 'end': timeEnd = changedTime; break;
+    }
+    return {
+      timeStart: timeStart,
+      timeGuest: timeGuest,
+      timeEnd: timeEnd,
+    }
+  }
+
+  lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+
+    if (timeGuest != null && timeStart >= timeGuest) {
+        this.setContent(itemId, `start_error`, true);
+    } else if (timeEnd != null && timeStart >= timeEnd) {
+        this.setContent(itemId, `start_error`, true);
+    }
+
+    if (timeGuest != null && timeEnd != null && timeGuest >= timeEnd) {
+        this.setContent(itemId, `guest_error`, true);
+    }
+  }
+
+  lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+
+     prevQuestions.forEach(question => {
+       const questionStart = parseInt(question.start_tms)
+       const questionGuest = parseInt(question.guest_tms)
+       const questionEnd = parseInt(question.end_tms)
+
+       if (timeStart !=null && (questionStart >= timeStart || questionGuest >= timeStart || questionEnd >= timeStart)) {
+          this.setContent(itemId, `start_error`, true);
+       }
+       if (timeGuest != null && (questionStart >= timeGuest || questionGuest >= timeGuest || questionEnd >= timeGuest)) {
+          this.setContent(itemId, `guest_error`, true);
+       }
+       if (timeEnd != null && (questionStart >= timeEnd || questionGuest >= timeEnd || questionEnd >= timeEnd)) {
+          this.setContent(itemId, `end_error`, true);
+       }
+
+     });
+
+  }
+
+  lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime) {
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+
+     nextQuestions.forEach(question => {
+      const questionStart = parseInt(question.start_tms)
+      const questionGuest = parseInt(question.guest_tms)
+      const questionEnd = parseInt(question.end_tms)
+
+      if (timeStart != null && (questionStart <= timeStart || questionGuest <= timeStart || questionEnd <= timeStart)) {
+        this.setContent(itemId, `start_error`, true);
+      }
+      if (timeGuest != null && (questionStart <= timeGuest || questionGuest <= timeGuest || questionEnd <= timeGuest)) {
+        this.setContent(itemId, `guest_error`, true);
+      }
+      if (timeEnd != null && (questionStart <= timeEnd || questionGuest <= timeEnd || questionEnd <= timeEnd)) {
+        this.setContent(itemId, `end_error`, true);
+      }
+    });
+
+  }
+
+  stampHasError(error) {
+    if (error) {
+      return {
+        boxShadow: '0 0 3px #ff0000'
+      };
+    }
+    return {};
   }
 
   render() {
@@ -328,30 +456,30 @@ class Quiz extends React.Component {
         <h2>{i18n.settings}</h2>
         <table>
           <tbody>
-          <tr>
-            <td>
-              <label>{i18n.answers}: </label>
-            </td>
-            <td>
-              {this.props.answers.map((item, i) => (
-                <Answer
-                  id={item.id}
-                  changeAnswerLabel={this.changeAnswerLabel}
-                  label={item.label}
-                />
+            <tr>
+              <td>
+                <label>{i18n.answers}: </label>
+              </td>
+              <td>
+                {this.props.answers.map((item, i) => (
+                  <Answer
+                    id={item.id}
+                    changeAnswerLabel={this.changeAnswerLabel}
+                    label={item.label}
+                  />
               ))}
-              <button
-                onClick={e => this.addAnswer(e)}
-                style={{position: 'absolute', right: '35', marginTop: '-50'}}
-              >{i18n.answer_btn}
-              </button>
-            </td>
-          </tr>
+                <button
+                  onClick={e => this.addAnswer(e)}
+                  style={{ position: 'absolute', right: '35', marginTop: '-50' }}
+                >{i18n.answer_btn}
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
         <div
           className="list-add-element" onClick={e => this.addQuestion(e)}
-          style={{marginTop: '20px'}}
+          style={{ marginTop: '20px' }}
         >
           <span>
             <svg
@@ -375,9 +503,14 @@ class Quiz extends React.Component {
             start_tms={item.start_tms}
             guest_tms={item.guest_tms}
             end_tms={item.end_tms}
+            start_error={item.start_error}
+            guest_error={item.guest_error}
+            end_error={item.end_error}
             correct_answer={item.correct_answer}
             setContent={this.setContent}
             answers={this.props.answers}
+            handleChangeTimeStamp={this.handleChangeTimeStamp}
+            stampHasError={this.stampHasError}
           />
         ))}
       </div>
@@ -388,7 +521,7 @@ class Quiz extends React.Component {
 
 componentLoader.registerComponent(
   'quiz',
-  {edit, preview},
+  { edit, preview },
   {
     isHotSpottable: true,
     isScrollable: false,
