@@ -42,8 +42,7 @@ class QuizContent extends React.Component {
         ...prevState,
         timeStamps: [...prevState.timeStamps, question.start_tms, question.guest_tms, question.end_tms],
       }))
-     ));
-
+    ));
     // Start Timer
     setInterval(() => {
       this.setState(prevState => ({
@@ -61,6 +60,7 @@ class QuizContent extends React.Component {
   componentWillUnmount() {
     unregisterHandlers(this);
   }
+
 
   up() {
     // Not allowed to change Button anymore after entering an answer, time's up or before 1st question
@@ -93,7 +93,6 @@ class QuizContent extends React.Component {
     if (this.state.timeEnterOver || this.state.currQuestion === -1) {
       return;
     }
-
     if (answeredBeforeGuests(this.state.lastStampIndex)) {
       this.setState(prevState => ({
         ...prevState,
@@ -134,22 +133,12 @@ class QuizContent extends React.Component {
   render() {
     const answers = this.props.answers;
     return (
-      <div>
-        <p style={{
-          fontSize: 'large',
-          backgroundColor: '#090928',
-          color: 'white'
-        }}>
-          Frage {this.state.currQuestion +1 }
-        </p>
-        <div style={{
-          textAlign: 'right',
-          fontSize: 'large',
-          backgroundColor: '#090928',
-          color: 'white'
-        }}>
-          Score: {this.state.score}</div>
-          Time: {this.state.playbackTime}
+      <div style={{position: 'relative'}}>
+        <div className="quiz-score">
+          <p>Frage {this.state.currQuestion + 1 }</p>
+          <p style={{align: 'right'}}>Score: {this.state.score}</p>
+          {/*<p>Time: {this.state.playbackTime}</p>*/}
+        </div>
         <div>
           {answers.map((answer, i) => (
             <QuizButton
@@ -160,6 +149,7 @@ class QuizContent extends React.Component {
               updateScore={this.updateScore}
               isRight={i == this.state.correct && this.state.timeEnterOver}
               enteredWrong={i != this.state.correct && this.state.timeEnterOver && i === this.state.enteredButton }
+              odd={ i !== 0 && i % 2 !== 0 }
             />
           ))
           }
@@ -168,9 +158,9 @@ class QuizContent extends React.Component {
           {/*correct: {this.state.correct}*/
           }
           {/*{*/}
-            {/*<OverText*/}
-              {/*lastQuestionOver={this.props.questions.length === this.state.currQuestion + 1 && this.state.timeEnterOver}*/}
-            {/*/>*/}
+          {/*<OverText*/}
+          {/*lastQuestionOver={this.props.questions.length === this.state.currQuestion + 1 && this.state.timeEnterOver}*/}
+          {/*/>*/}
           {/*}*/}
         </div>
       </div>
@@ -201,13 +191,9 @@ function OverText({lastQuestionOver}) {
   return ( <div>{text}</div>);
 }
 
-function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false, isRight = false, enteredWrong = false}) {
+function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false, isRight = false, enteredWrong = false, odd = false}) {
   let css = {
-    fontSize: 'large',
-    color: 'white',
-    marginTop: '8px',
-    border: '2px #ddd solid',
-    width: '100%'
+    border: '2px #fff solid'
   }
   if (isRight) {
     css.border = '2px #0f0 solid';
@@ -216,14 +202,21 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
   } else if (isEntered) {
     css.border = '2px #ffa500 solid';
   } else if (dontSelect) {
-    css.border = '2px #000 solid';
+    css.border = '2px #ddd solid';
   } else if (isSelected) {
     css.border = '2px #00f solid';
   } else {
-    css.border = '2px #ddd solid';
+    css.border = '2px #fff solid';
+  }
+
+  let marker;
+  if (odd) {
+    marker = 'wrapper odd';
+  } else {
+    marker = 'wrapper';
   }
   return (
-    <div>
+    <div className={marker}>
       <button className="quiz-button" style={css}>{item.label}</button>
     </div>
   );
@@ -257,7 +250,7 @@ function insideQuestion(stampIndex) {
   }
   return false;
 }
-  // return the last timeStamp which the current time passed. Could change when playing a video.
+// return the last timeStamp which the current time passed. Could change when playing a video.
 function getCurrTimeStamp(currTime, timeStamps) {
   var i;
   for (i = 0; i < timeStamps.length; i++) {
@@ -275,29 +268,29 @@ function freeButtons(prevState) {
     enteredButton: -1,
   };
   return newState;
-}
 
+}
 //change the state when a new question started or I jumped into another question
 function setStateEnteredQuestion(lastStampIndex, currStampIndex, prevState, questions) {
-  const currQuestionIndex = Math.floor(currStampIndex/3);
+  const currQuestionIndex = Math.floor(currStampIndex / 3);
   const currQuestion = questions[currQuestionIndex];
-  if(newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
-      return prevState; //TODO Das nach außen ziehen
-  } // Don't need to change State if we're switched from before guests to after guests 
+  if (newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
+    return prevState; //TODO Das nach außen ziehen
+  } // Don't need to change State if we're switched from before guests to after guests
   const newState = {
-      ...prevState,
-      selectedButton: 0, // Start at A again
-      enteredButton: -1, // Delete curr answer
-      enteredBeforeGuest: false, // Hasn't entered yet
-      timeEnterOver: false, // Unlock Buttons for new Question
-      correct: currQuestion.correct_answer,
-      currQuestion: currQuestionIndex,
-    };
+    ...prevState,
+    selectedButton: 0, // Start at A again
+    enteredButton: -1, // Delete curr answer
+    enteredBeforeGuest: false, // Hasn't entered yet
+    timeEnterOver: false, // Unlock Buttons for new Question
+    correct: currQuestion.correct_answer,
+    currQuestion: currQuestionIndex,
+  };
   return newState;
 }
 
 function setStateLeftQuestion(currStampIndex, prevState, questions) {
-  const currQuestionIndex = Math.floor(currStampIndex/3);
+  const currQuestionIndex = Math.floor(currStampIndex / 3);
   const newState = {
     ...prevState,
     enteredBeforeGuest: false,
@@ -322,7 +315,7 @@ function handleTimesAndInputs() {
       this.setState(newState);
     }
 
-    if(insideQuestion(currStampIndex)) {
+    if (insideQuestion(currStampIndex)) {
       const newState = setStateEnteredQuestion(lastStampIndex, currStampIndex, this.state, questions);
       this.setState(newState);
     }
@@ -338,7 +331,7 @@ function handleTimesAndInputs() {
       }
 
       const newState = setStateLeftQuestion(currStampIndex, this.state, questions);
-        this.setState(newState);
+      this.setState(newState);
     }
 
     this.setState(prevState => ({
