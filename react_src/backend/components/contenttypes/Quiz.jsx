@@ -258,6 +258,33 @@ class Question extends React.Component {
                 </select>
               </td>
             </tr>
+            <tr>
+              <button
+                type="button"
+                onClick={() => this.props.deleteQuestion(this.props.id)}
+                className="button white_blue img_left"
+                style={{ position: 'absolute', right: 10, bottom: 10 }}
+              >
+                <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                  <path
+                    d="M68.26,31.71h-35a1.78,1.78,0,0,0-1.78,1.94l3.78,44.48A1.78,1.78,0,0,0,37,79.76H64.49a1.78,1.78,0,0,0,1.78-1.63L70,33.65a1.78,1.78,0,0,0-1.78-1.94ZM62.85,76.19H38.64L35.17,35.28H66.32Z"
+                  />
+                  <path
+                    d="M69.17,26.34H52.53V24.23a1.78,1.78,0,0,0-3.57,0v2.11H32.32a1.78,1.78,0,0,0,0,3.57H69.17a1.78,1.78,0,1,0,0-3.57Z"
+                  />
+                  <path
+                    d="M41.31,72a1.78,1.78,0,0,0,1.78,1.63h.16a1.78,1.78,0,0,0,1.62-1.93L42.18,40.53a1.78,1.78,0,0,0-3.56.31Z"
+                  />
+                  <path
+                    d="M58.24,73.67h.16A1.78,1.78,0,0,0,60.17,72l2.68-31.22a1.78,1.78,0,1,0-3.56-.31L56.62,71.74A1.78,1.78,0,0,0,58.24,73.67Z"
+                  />
+                  <path
+                    d="M50.74,73.68a1.79,1.79,0,0,0,1.78-1.78V40.61a1.78,1.78,0,1,0-3.57,0V71.89A1.79,1.79,0,0,0,50.74,73.68Z"
+                  />
+                </svg>
+                {i18n.delete_question}
+              </button>
+            </tr>
           </table>
         </div>
         {/* <div className="list-add-element">*/}
@@ -319,6 +346,44 @@ class Quiz extends React.Component {
     this.props.changeAreaContent({ answers });
   }
 
+
+  deleteAnswer() {
+    let { answers } = this.props;
+    answers = answers.concat();
+    this.checkIfAnswerWasUsedBefore(answers.length - 1, (alarm) => {
+      answers.splice(-1, 1);
+      this.props.changeAreaContent({ answers });
+
+      const { questions } = this.props;
+      for (let i = 0; i < alarm.length; i++) {
+        questions[alarm[i]].correct_answer = 0;
+      }
+      this.props.changeAreaContent({ questions });
+
+      for (let i = 0; i < questions.length; i++) {
+        alert(questions[i].correct_answer);
+      }
+    });
+  }
+
+
+  checkIfAnswerWasUsedBefore(answer, callback) {
+    let { questions } = this.props;
+    questions = questions.concat();
+
+    let { answers } = this.props;
+    answers = answers.concat();
+
+    const alarm = [];
+    for (let i = 0; i < questions.length; i++) {
+      if (questions[i].correct_answer === answer.toString()) {
+        alert(`Attention! You're about to delete an answer option that's already used in question ${i + 1}. Correct answer for this question will be set to ${answers[0].label} by default.`);
+        alarm.push(i);
+      }
+    }
+    callback(alarm);
+  }
+
   addQuestion(e) {
     e.preventDefault();
     const { questions } = this.props;
@@ -350,11 +415,11 @@ class Quiz extends React.Component {
     const currQuestion = questions[idx];
 
     // Look if still errors for times in the current question
-    this.setContent(itemId, `start_error`, false);
-    this.setContent(itemId, `guest_error`, false);
-    this.setContent(itemId, `end_error`, false);
+    this.setContent(itemId, 'start_error', false);
+    this.setContent(itemId, 'guest_error', false);
+    this.setContent(itemId, 'end_error', false);
 
-    
+
     // Case 1: Show error if one time stamp is smaller than a previous one in the same question
     this.lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime);
 
@@ -363,7 +428,7 @@ class Quiz extends React.Component {
     this.lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime);
 
     // Case 3: Show error if one time stamp is bigger than any one in a next question
-    const nextQuestions = questions.slice(idx+1);
+    const nextQuestions = questions.slice(idx + 1);
     this.lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime);
   }
 
@@ -372,73 +437,76 @@ class Quiz extends React.Component {
     let timeGuest = currQuestion.guest_tms;
     let timeEnd = currQuestion.end_tms;
 
-    switch(name) {
-      case 'start': timeStart = changedTime; break;
-      case 'guest': timeGuest = changedTime; break;
-      case 'end': timeEnd = changedTime; break;
+    switch (name) {
+      case 'start':
+        timeStart = changedTime;
+        break;
+      case 'guest':
+        timeGuest = changedTime;
+        break;
+      case 'end':
+        timeEnd = changedTime;
+        break;
     }
     return {
-      timeStart: timeStart,
-      timeGuest: timeGuest,
-      timeEnd: timeEnd,
-    }
+      timeStart,
+      timeGuest,
+      timeEnd
+    };
   }
 
   lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
-    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
     if (timeGuest != null && timeStart >= timeGuest) {
-        this.setContent(itemId, `start_error`, true);
+      this.setContent(itemId, 'start_error', true);
     } else if (timeEnd != null && timeStart >= timeEnd) {
-        this.setContent(itemId, `start_error`, true);
+      this.setContent(itemId, 'start_error', true);
     }
 
     if (timeGuest != null && timeEnd != null && timeGuest >= timeEnd) {
-        this.setContent(itemId, `guest_error`, true);
+      this.setContent(itemId, 'guest_error', true);
     }
   }
 
   lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
-    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
-     prevQuestions.forEach(question => {
-       const questionStart = parseInt(question.start_tms)
-       const questionGuest = parseInt(question.guest_tms)
-       const questionEnd = parseInt(question.end_tms)
+    prevQuestions.forEach((question) => {
+      const questionStart = parseInt(question.start_tms);
+      const questionGuest = parseInt(question.guest_tms);
+      const questionEnd = parseInt(question.end_tms);
 
-       if (timeStart !=null && (questionStart >= timeStart || questionGuest >= timeStart || questionEnd >= timeStart)) {
-          this.setContent(itemId, `start_error`, true);
-       }
-       if (timeGuest != null && (questionStart >= timeGuest || questionGuest >= timeGuest || questionEnd >= timeGuest)) {
-          this.setContent(itemId, `guest_error`, true);
-       }
-       if (timeEnd != null && (questionStart >= timeEnd || questionGuest >= timeEnd || questionEnd >= timeEnd)) {
-          this.setContent(itemId, `end_error`, true);
-       }
-
-     });
-
+      if (timeStart != null && (questionStart >= timeStart || questionGuest >= timeStart || questionEnd >= timeStart)) {
+        this.setContent(itemId, 'start_error', true);
+      }
+      if (timeGuest != null && (questionStart >= timeGuest || questionGuest >= timeGuest || questionEnd >= timeGuest)) {
+        this.setContent(itemId, 'guest_error', true);
+      }
+      if (timeEnd != null && (questionStart >= timeEnd || questionGuest >= timeEnd || questionEnd >= timeEnd)) {
+        this.setContent(itemId, 'end_error', true);
+      }
+    });
   }
 
   lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime) {
-    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion)
+    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
-     nextQuestions.forEach(question => {
-      const questionStart = parseInt(question.start_tms)
-      const questionGuest = parseInt(question.guest_tms)
-      const questionEnd = parseInt(question.end_tms)
+    nextQuestions.forEach((question) => {
+      const questionStart = parseInt(question.start_tms);
+      const questionGuest = parseInt(question.guest_tms);
+      const questionEnd = parseInt(question.end_tms);
 
       if (timeStart != null && (questionStart <= timeStart || questionGuest <= timeStart || questionEnd <= timeStart)) {
-        this.setContent(itemId, `start_error`, true);
+        this.setContent(itemId, 'start_error', true);
       }
       if (timeGuest != null && (questionStart <= timeGuest || questionGuest <= timeGuest || questionEnd <= timeGuest)) {
-        this.setContent(itemId, `guest_error`, true);
+        this.setContent(itemId, 'guest_error', true);
       }
       if (timeEnd != null && (questionStart <= timeEnd || questionGuest <= timeEnd || questionEnd <= timeEnd)) {
-        this.setContent(itemId, `end_error`, true);
+        this.setContent(itemId, 'end_error', true);
       }
     });
-
   }
 
   stampHasError(error) {
@@ -448,6 +516,14 @@ class Quiz extends React.Component {
       };
     }
     return {};
+  }
+
+  deleteQuestion(itemId) {
+    let { questions } = this.props;
+    const idx = questions.findIndex(({ id }) => id === itemId);
+    questions = questions.concat();
+    questions.splice(idx, 1);
+    this.props.changeAreaContent({ questions });
   }
 
   render() {
@@ -468,24 +544,51 @@ class Quiz extends React.Component {
                     label={item.label}
                   />
               ))}
-                <button
-                  onClick={e => this.addAnswer(e)}
-                  style={{ position: 'absolute', right: '35', marginTop: '-50' }}
-                >{i18n.answer_btn}
-                </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <div style={{ marginTop: '10px' }}>
+          <button
+            type="button"
+            onClick={e => this.addAnswer(e)}
+            className="button white_blue"
+            style={{ marginRight: '10px', marginBottom: '30px', float: 'right' }}
+          >{i18n.answer_btn}
+          </button>
+          <button
+            type="button"
+            onClick={() => this.deleteAnswer()}
+            className="button white_blue img_left"
+            style={{ marginRight: '10px', float: 'right' }}
+          >
+            <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <path
+                d="M68.26,31.71h-35a1.78,1.78,0,0,0-1.78,1.94l3.78,44.48A1.78,1.78,0,0,0,37,79.76H64.49a1.78,1.78,0,0,0,1.78-1.63L70,33.65a1.78,1.78,0,0,0-1.78-1.94ZM62.85,76.19H38.64L35.17,35.28H66.32Z"
+              />
+              <path
+                d="M69.17,26.34H52.53V24.23a1.78,1.78,0,0,0-3.57,0v2.11H32.32a1.78,1.78,0,0,0,0,3.57H69.17a1.78,1.78,0,1,0,0-3.57Z"
+              />
+              <path
+                d="M41.31,72a1.78,1.78,0,0,0,1.78,1.63h.16a1.78,1.78,0,0,0,1.62-1.93L42.18,40.53a1.78,1.78,0,0,0-3.56.31Z"
+              />
+              <path
+                d="M58.24,73.67h.16A1.78,1.78,0,0,0,60.17,72l2.68-31.22a1.78,1.78,0,1,0-3.56-.31L56.62,71.74A1.78,1.78,0,0,0,58.24,73.67Z"
+              />
+              <path
+                d="M50.74,73.68a1.79,1.79,0,0,0,1.78-1.78V40.61a1.78,1.78,0,1,0-3.57,0V71.89A1.79,1.79,0,0,0,50.74,73.68Z"
+              />
+            </svg>
+            {i18n.delete_answer}
+          </button>
+        </div>
         <div
-          className="list-add-element" onClick={e => this.addQuestion(e)}
-          style={{ marginTop: '20px' }}
+          className="list-add-element"
+          onClick={e => this.addQuestion(e)}
+          style={{ marginTop: '20px', clear: 'both' }}
         >
           <span>
-            <svg
-              id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 100 100"
-            >
+            <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
               <path
                 d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"
               />
@@ -511,6 +614,7 @@ class Quiz extends React.Component {
             answers={this.props.answers}
             handleChangeTimeStamp={this.handleChangeTimeStamp}
             stampHasError={this.stampHasError}
+            deleteQuestion={this.deleteQuestion}
           />
         ))}
       </div>

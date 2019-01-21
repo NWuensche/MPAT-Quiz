@@ -382,9 +382,8 @@ const en = {
     end_tms: 'ENDS AT',
     sec: 'sec',
     correct_answer: 'CORRECT ANSWER',
-    deleteOption: 'Delete',
-    ttDeleteOption: 'Delete this answer option'
-
+    delete_question: 'Delete Question',
+    delete_answer: 'Delete last answer'
   },
   broadcast: {
     notice1: 'The broadcast component displays the broadcast signal on the TV.',
