@@ -25,19 +25,19 @@
  * Marco Ferrari (marco.ferrari@finconsgroup.com)
  *
  **/
-import React, { PropTypes as Types } from 'react';
+import React, {PropTypes as Types} from 'react';
 import autobind from 'class-autobind';
-import { componentLoader } from '../../../ComponentLoader';
-import { noSubmitOnEnter } from '../../utils';
-import { getTooltipped } from '../../tooltipper';
+import {componentLoader} from '../../../ComponentLoader';
+import {noSubmitOnEnter} from '../../utils';
+import {getTooltipped} from '../../tooltipper';
 import Constants from '../../../constants';
-import { generateId } from '../../../functions';
+import {generateId} from '../../../functions';
 
 
 const i18n = Constants.locstr.quiz;
 
 function edit(params) {
-  const { id, data, changeAreaContent } = params;
+  const {id, data, changeAreaContent} = params;
   return (
     <Quiz
       id={id}
@@ -60,23 +60,23 @@ function sharedProps() {
   return {
     // updateItem: this.updateItem,
     remoteKeys: [
-      { key: '', label: 'Select Remote Button' },
-      { key: 'VK_0', label: '0', disabled: false },
-      { key: 'VK_1', label: '1', disabled: false },
-      { key: 'VK_2', label: '2', disabled: false },
-      { key: 'VK_3', label: '3', disabled: false },
-      { key: 'VK_4', label: '4', disabled: false },
-      { key: 'VK_5', label: '5', disabled: false },
-      { key: 'VK_6', label: '6', disabled: false },
-      { key: 'VK_7', label: '7', disabled: false },
-      { key: 'VK_8', label: '8', disabled: false },
-      { key: 'VK_9', label: '9', disabled: false },
-      { key: 'VK_RED', label: 'red', disabled: false },
-      { key: 'VK_YELLOW', label: 'yellow', disabled: false },
-      { key: 'VK_GREEN', label: 'green', disabled: false },
-      { key: 'VK_BLUE', label: 'blue', disabled: false },
-      { key: 'VK_BACK', label: 'back', disabled: false },
-      { key: 'VK_OK', label: 'ok', disabled: false }
+      {key: '', label: 'Select Remote Button'},
+      {key: 'VK_0', label: '0', disabled: false},
+      {key: 'VK_1', label: '1', disabled: false},
+      {key: 'VK_2', label: '2', disabled: false},
+      {key: 'VK_3', label: '3', disabled: false},
+      {key: 'VK_4', label: '4', disabled: false},
+      {key: 'VK_5', label: '5', disabled: false},
+      {key: 'VK_6', label: '6', disabled: false},
+      {key: 'VK_7', label: '7', disabled: false},
+      {key: 'VK_8', label: '8', disabled: false},
+      {key: 'VK_9', label: '9', disabled: false},
+      {key: 'VK_RED', label: 'red', disabled: false},
+      {key: 'VK_YELLOW', label: 'yellow', disabled: false},
+      {key: 'VK_GREEN', label: 'green', disabled: false},
+      {key: 'VK_BLUE', label: 'blue', disabled: false},
+      {key: 'VK_BACK', label: 'back', disabled: false},
+      {key: 'VK_OK', label: 'ok', disabled: false}
     ]
   };
 }
@@ -137,12 +137,12 @@ class Answer extends React.Component {
 
   render() {
     return (
-      <div className="answer" style={{ display: 'table-cell' }}>
+      <div className="answer" style={{display: 'table-cell'}}>
         Label<input
-          type="text"
-          value={this.props.label}
-          onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
-        />
+        type="text"
+        value={this.props.label}
+        onChange={e => this.props.changeAnswerLabel(this.props.id, 'label', e.target.value)}
+      />
       </div>
     );
   }
@@ -263,7 +263,7 @@ class Question extends React.Component {
                 type="button"
                 onClick={() => this.props.deleteQuestion(this.props.id)}
                 className="button white_blue img_left"
-                style={{ position: 'absolute', right: 10, bottom: 10 }}
+                style={{position: 'absolute', right: 10, bottom: 10}}
               >
                 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                   <path
@@ -332,71 +332,71 @@ class Quiz extends React.Component {
 
 
   setContent(itemId, key, value) {
-    let { questions } = this.props;
-    const idx = questions.findIndex(({ id }) => id === itemId);
+    let {questions} = this.props;
+    const idx = questions.findIndex(({id}) => id === itemId);
     questions = questions.concat();
     questions[idx][key] = value;
-    this.props.changeAreaContent({ questions });
+    this.props.changeAreaContent({questions});
+    console.log('hey')
   }
 
   addAnswer(e) {
     e.preventDefault();
-    const { answers } = this.props;
+    const {answers} = this.props;
     answers.push(createDefaultAnswer());
-    this.props.changeAreaContent({ answers });
+    this.props.changeAreaContent({answers});
   }
 
 
   deleteAnswer() {
-    let { answers } = this.props;
+    let {answers} = this.props;
     answers = answers.concat();
     this.checkIfAnswerWasUsedBefore(answers.length - 1, (alarm) => {
       answers.splice(-1, 1);
-      this.props.changeAreaContent({ answers });
+      this.props.changeAreaContent({answers});
 
-      const { questions } = this.props;
+      const {questions} = this.props;
       for (let i = 0; i < alarm.length; i++) {
         questions[alarm[i]].correct_answer = 0;
       }
-      this.props.changeAreaContent({ questions });
-
-      for (let i = 0; i < questions.length; i++) {
-        alert(questions[i].correct_answer);
-      }
+      this.props.changeAreaContent({questions});
     });
   }
 
 
   checkIfAnswerWasUsedBefore(answer, callback) {
-    let { questions } = this.props;
+    let {questions} = this.props;
     questions = questions.concat();
 
-    let { answers } = this.props;
+    let {answers} = this.props;
     answers = answers.concat();
 
     const alarm = [];
     for (let i = 0; i < questions.length; i++) {
       if (questions[i].correct_answer === answer.toString()) {
-        alert(`Attention! You're about to delete an answer option that's already used in question ${i + 1}. Correct answer for this question will be set to ${answers[0].label} by default.`);
         alarm.push(i);
       }
+    }
+    if (alarm.length > 0) {
+      const message = alarm.map(i => i + 1);
+      alert(`Attention! You're about to delete an answer option that's already used in question(s) ${message.toString()}. Correct answer for this question will be set to ${answers[0].label} by default.`);
     }
     callback(alarm);
   }
 
   addQuestion(e) {
     e.preventDefault();
-    const { questions } = this.props;
+    const {questions} = this.props;
     questions.push(createDefaultQuestion());
-    this.props.changeAreaContent({ questions });
+    this.props.changeAreaContent({questions});
   }
 
   changeAnswerLabel(itemId, key, value) {
-    let { answers } = this.props;
-    const idx = answers.findIndex(({ id }) => id === itemId);
+    let {answers} = this.props;
+    const idx = answers.findIndex(({id}) => id === itemId);
     answers = answers.concat();
     answers[idx][key] = value;
-    this.props.changeAreaContent({ answers });
+    this.props.changeAreaContent({answers});
   }
 
 
@@ -409,8 +409,8 @@ class Quiz extends React.Component {
 
     this.setContent(itemId, `${name}_tms`, changedTime);
 
-    let { questions } = this.props;
-    const idx = questions.findIndex(({ id }) => id === itemId);
+    let {questions} = this.props;
+    const idx = questions.findIndex(({id}) => id === itemId);
     questions = questions.concat();
     const currQuestion = questions[idx];
 
@@ -456,7 +456,7 @@ class Quiz extends React.Component {
   }
 
   lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
-    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
     if (timeGuest != null && timeStart >= timeGuest) {
       this.setContent(itemId, 'start_error', true);
@@ -470,7 +470,7 @@ class Quiz extends React.Component {
   }
 
   lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
-    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
     prevQuestions.forEach((question) => {
       const questionStart = parseInt(question.start_tms);
@@ -490,7 +490,7 @@ class Quiz extends React.Component {
   }
 
   lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime) {
-    const { timeStart, timeGuest, timeEnd } = this.getStampsCurrQuestion(name, changedTime, currQuestion);
+    const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
     nextQuestions.forEach((question) => {
       const questionStart = parseInt(question.start_tms);
@@ -519,11 +519,11 @@ class Quiz extends React.Component {
   }
 
   deleteQuestion(itemId) {
-    let { questions } = this.props;
-    const idx = questions.findIndex(({ id }) => id === itemId);
+    let {questions} = this.props;
+    const idx = questions.findIndex(({id}) => id === itemId);
     questions = questions.concat();
     questions.splice(idx, 1);
-    this.props.changeAreaContent({ questions });
+    this.props.changeAreaContent({questions});
   }
 
   render() {
@@ -532,35 +532,35 @@ class Quiz extends React.Component {
         <h2>{i18n.settings}</h2>
         <table>
           <tbody>
-            <tr>
-              <td>
-                <label>{i18n.answers}: </label>
-              </td>
-              <td>
-                {this.props.answers.map((item, i) => (
-                  <Answer
-                    id={item.id}
-                    changeAnswerLabel={this.changeAnswerLabel}
-                    label={item.label}
-                  />
+          <tr>
+            <td>
+              <label>{i18n.answers}: </label>
+            </td>
+            <td>
+              {this.props.answers.map((item, i) => (
+                <Answer
+                  id={item.id}
+                  changeAnswerLabel={this.changeAnswerLabel}
+                  label={item.label}
+                />
               ))}
-              </td>
-            </tr>
+            </td>
+          </tr>
           </tbody>
         </table>
-        <div style={{ marginTop: '10px' }}>
+        <div style={{marginTop: '10px'}}>
           <button
             type="button"
             onClick={e => this.addAnswer(e)}
             className="button white_blue"
-            style={{ marginRight: '10px', marginBottom: '30px', float: 'right' }}
+            style={{marginRight: '10px', marginBottom: '30px', float: 'right'}}
           >{i18n.answer_btn}
           </button>
           <button
             type="button"
             onClick={() => this.deleteAnswer()}
             className="button white_blue img_left"
-            style={{ marginRight: '10px', float: 'right' }}
+            style={{marginRight: '10px', float: 'right'}}
           >
             <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
               <path
@@ -585,7 +585,7 @@ class Quiz extends React.Component {
         <div
           className="list-add-element"
           onClick={e => this.addQuestion(e)}
-          style={{ marginTop: '20px', clear: 'both' }}
+          style={{marginTop: '20px', clear: 'both'}}
         >
           <span>
             <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -625,7 +625,7 @@ class Quiz extends React.Component {
 
 componentLoader.registerComponent(
   'quiz',
-  { edit, preview },
+  {edit, preview},
   {
     isHotSpottable: true,
     isScrollable: false,
