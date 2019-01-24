@@ -581,42 +581,38 @@ class Quiz extends React.Component {
             </svg>
             {i18n.delete_answer}
           </button>
-        </div>
-        <div
-          className="list-add-element"
-          onClick={e => this.addQuestion(e)}
-          style={{marginTop: '20px', clear: 'both'}}
-        >
-          <span>
-            <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-              <path
-                d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"
+          <div style={{marginTop: '20px', clear: 'both'}}>
+            <div className="list-add-element" onClick={e => this.addQuestion(e)}>
+            <span>
+              <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <path
+                  d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"/>
+                <path
+                  d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"/>
+              </svg>
+            </span>
+              <p>{i18n.add_question}</p>
+            </div>
+            {this.props.questions.map((item, i) => (
+              <Question
+                id={item.id}
+                label={item.label}
+                start_tms={item.start_tms}
+                guest_tms={item.guest_tms}
+                end_tms={item.end_tms}
+                start_error={item.start_error}
+                guest_error={item.guest_error}
+                end_error={item.end_error}
+                correct_answer={item.correct_answer}
+                setContent={this.setContent}
+                answers={this.props.answers}
+                handleChangeTimeStamp={this.handleChangeTimeStamp}
+                stampHasError={this.stampHasError}
+                deleteQuestion={this.deleteQuestion}
               />
-              <path
-                d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"
-              />
-            </svg>
-          </span>
-          <p>{i18n.add_question}</p>
+            ))}
+          </div>
         </div>
-        {this.props.questions.map((item, i) => (
-          <Question
-            id={item.id}
-            label={item.label}
-            start_tms={item.start_tms}
-            guest_tms={item.guest_tms}
-            end_tms={item.end_tms}
-            start_error={item.start_error}
-            guest_error={item.guest_error}
-            end_error={item.end_error}
-            correct_answer={item.correct_answer}
-            setContent={this.setContent}
-            answers={this.props.answers}
-            handleChangeTimeStamp={this.handleChangeTimeStamp}
-            stampHasError={this.stampHasError}
-            deleteQuestion={this.deleteQuestion}
-          />
-        ))}
       </div>
     );
   }
