@@ -17,12 +17,9 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  *
  * AUTHORS:
- * Miggi Zwicklbauer (miggi.zwicklbauer@fokus.fraunhofer.de)
- * Thomas Tröllmich  (thomas.troellmich@fokus.fraunhofer.de)
- * Jean-Philippe Ruijs (github.com/jeanphilipperuijs)
- * Jean-Claude Dufourd (jean-claude.dufourd@telecom-paristech.fr
- * Stefano Miccoli (stefano.miccoli@finconsgroup.com)
- * Marco Ferrari (marco.ferrari@finconsgroup.com)
+ * Carolin Stolpe
+ * Niklas Wünsche
+ * Felix Bammel
  *
  **/
 import React, {PropTypes as Types} from 'react';
@@ -32,7 +29,6 @@ import {noSubmitOnEnter} from '../../utils';
 import {getTooltipped} from '../../tooltipper';
 import Constants from '../../../constants';
 import {generateId} from '../../../functions';
-
 
 const i18n = Constants.locstr.quiz;
 
@@ -414,7 +410,7 @@ class Quiz extends React.Component {
     questions = questions.concat();
     const currQuestion = questions[idx];
 
-    // Look if still errors for times in the current question
+    // Look if still errors for times in the current question, therefore start with assumition that all errors are fixed
     this.setContent(itemId, 'start_error', false);
     this.setContent(itemId, 'guest_error', false);
     this.setContent(itemId, 'end_error', false);
@@ -432,6 +428,7 @@ class Quiz extends React.Component {
     this.lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime);
   }
 
+  // Add the changed time in the right spot for the calculations
   getStampsCurrQuestion(name, changedTime, currQuestion) {
     let timeStart = currQuestion.start_tms;
     let timeGuest = currQuestion.guest_tms;
@@ -455,6 +452,7 @@ class Quiz extends React.Component {
     };
   }
 
+  //If I can find for the current timeStamp x any timeStamp inside the same question that collides with x, show an error
   lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
     const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
@@ -469,6 +467,7 @@ class Quiz extends React.Component {
     }
   }
 
+  //If I can find for the current timeStamp x any timeStamp in a previous question that is smaller than x, show an error
   lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
     const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
@@ -489,6 +488,7 @@ class Quiz extends React.Component {
     });
   }
 
+  // If I can find for the current timeStamp x any timeStamp in a later question that is bigger than x, show an error
   lookForSmallerStampsInNextQuestions(itemId, currQuestion, nextQuestions, changedTime) {
     const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
@@ -509,6 +509,7 @@ class Quiz extends React.Component {
     });
   }
 
+  // Show red border around input field if time collides with another one
   stampHasError(error) {
     if (error) {
       return {

@@ -1,3 +1,38 @@
+/**
+ *
+ * Copyright (c) 2019 MPAT Consortium , All rights
+reserved.
+ * Fraunhofer FOKUS, Fincons Group, Telecom ParisTech, IRT,
+Lancaster University, Leadin, RBB, Mediaset
+ *
+ * This program is free software; you can redistribute it
+and/or
+ * modify it under the terms of the GNU General Public
+License
+ * as published by the Free Software Foundation; either
+version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be
+useful,
+ * but WITHOUT ANY WARRANTY; without even the implied
+warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser
+General Public
+ * License along with this library. If not, see
+<http://www.gnu.org/licenses/>.
+ *
+ * AUTHORS:
+ * Carolin Stolpe
+ * Niklas Wünsche
+ * Felix Bammel
+ *
+ **/
+
 import React from 'react';
 import autobind from 'class-autobind';
 
@@ -28,6 +63,7 @@ class QuizContent extends React.Component {
     // Register Key Handlers
     registerHandlers(this, handlersWithTag('active', [
       createHandler(KeyEvent.VK_UP, this.up.bind(this)),
+      // Add shortcuts to answer questions fast
       createHandler(KeyEvent.VK_1, this.shortcutEnter.bind(this, 0)),
       createHandler(KeyEvent.VK_2, this.shortcutEnter.bind(this, 1)),
       createHandler(KeyEvent.VK_3, this.shortcutEnter.bind(this, 2)),
@@ -43,7 +79,7 @@ class QuizContent extends React.Component {
         timeStamps: [...prevState.timeStamps, question.start_tms, question.guest_tms, question.end_tms],
       }))
     ));
-    // Start Timer
+    // Start Timer for Video
     setInterval(() => {
       this.setState(prevState => ({
         ...prevState,
@@ -51,8 +87,7 @@ class QuizContent extends React.Component {
       }));
     }, 1000);
 
-    // TODO Noch vorher 1x ausführen, da erst bei 1 sec erstes mal ausgeführt?
-    //Check if behind new time
+    //Check if jump inside video or input was given
     handleTimesAndInputs.call(this);
     setInterval(handleTimesAndInputs.bind(this), 1000);
   }
@@ -105,7 +140,7 @@ class QuizContent extends React.Component {
     }));
   }
 
-  // e.g. first answer shortcut -> entered = 0
+  // For example first answer shortcut -> entered = 0
   shortcutEnter(entered) {
     // Not allowed to enter button when time's up or before 1st question
     if (this.state.timeEnterOver || this.state.currQuestion === -1) {
@@ -168,7 +203,7 @@ class QuizContent extends React.Component {
   }
 }
 
-// When you watch the video in a linear fashion, two things can happen with the Indices from the last second and the current second
+// When you watch the video in a linear fashion, two things can happen with the indices from the last second and the current second
 // Case 1: Indices are the same; Case 2: currIndex is one bigger than lastIndex because new Question started/ended
 // If none of these cases applies, the viewer jumped inside the video
 function jumpedInVideo(lastIndex, currIndex) {
@@ -242,7 +277,7 @@ function newMod(m, n) {
   return ((m % n) + n) % n;
 }
 
-// returns true if given stamp is between start and end time stamp of a question
+// Returns true if given stamp is between start and end time stamp of a question
 // which is equivalent to index of stamp is odd
 function insideQuestion(stampIndex) {
   if (newMod(stampIndex, 3) === 0 || newMod(stampIndex, 3) === 1) {
@@ -250,7 +285,8 @@ function insideQuestion(stampIndex) {
   }
   return false;
 }
-// return the last timeStamp which the current time passed. Could change when playing a video.
+
+// Return the last timeStamp which the current time passed. Could change when playing a video.
 function getCurrTimeStamp(currTime, timeStamps) {
   var i;
   for (i = 0; i < timeStamps.length; i++) {
@@ -258,7 +294,7 @@ function getCurrTimeStamp(currTime, timeStamps) {
       break;
     }
   }
-  return i - 1; // decrease because first stamp is 0, not 1
+  return i - 1; // Decrease stamp because first stamp is 0, not 1
 }
 
 // When viewer jumped in video, free all buttons
@@ -270,17 +306,17 @@ function freeButtons(prevState) {
   return newState;
 
 }
-//change the state when a new question started or I jumped into another question
+// Change the state when a new question started or I jumped into another question
 function setStateEnteredQuestion(lastStampIndex, currStampIndex, prevState, questions) {
   const currQuestionIndex = Math.floor(currStampIndex / 3);
   const currQuestion = questions[currQuestionIndex];
   if (newMod(currStampIndex, 3) === 1 && !jumpedInVideo(lastStampIndex, currStampIndex)) {
-    return prevState; //TODO Das nach außen ziehen
+    return prevState;
   } // Don't need to change State if we're switched from before guests to after guests
   const newState = {
     ...prevState,
     selectedButton: 0, // Start at A again
-    enteredButton: -1, // Delete curr answer
+    enteredButton: -1, // Delete current answer
     enteredBeforeGuest: false, // Hasn't entered yet
     timeEnterOver: false, // Unlock Buttons for new Question
     correct: currQuestion.correct_answer,
@@ -289,6 +325,7 @@ function setStateEnteredQuestion(lastStampIndex, currStampIndex, prevState, ques
   return newState;
 }
 
+// Question was left since we lasted changed
 function setStateLeftQuestion(currStampIndex, prevState, questions) {
   const currQuestionIndex = Math.floor(currStampIndex / 3);
   const newState = {
@@ -323,7 +360,7 @@ function handleTimesAndInputs() {
       // First Check if answer is right
       if (this.state.correct == this.state.enteredButton && this.state.correct !== -1) { // Right Button was entered and we are not in build up state
         if (this.state.enteredBeforeGuest) {
-          this.setState({score: this.state.score + 2}); // Extra points for answering fast
+          this.setState({score: this.state.score + 2}); // Extra points for answering before guests
         }
         else {
           this.setState({score: this.state.score + 1});
