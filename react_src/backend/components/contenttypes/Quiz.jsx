@@ -22,11 +22,10 @@
  * Felix Bammel
  *
  **/
+
 import React, {PropTypes as Types} from 'react';
 import autobind from 'class-autobind';
 import {componentLoader} from '../../../ComponentLoader';
-import {noSubmitOnEnter} from '../../utils';
-import {getTooltipped} from '../../tooltipper';
 import Constants from '../../../constants';
 import {generateId} from '../../../functions';
 
@@ -52,30 +51,22 @@ function preview() {
   );
 }
 
-function sharedProps() {
-  return {
-    // updateItem: this.updateItem,
-    remoteKeys: [
-      {key: '', label: 'Select Remote Button'},
-      {key: 'VK_0', label: '0', disabled: false},
-      {key: 'VK_1', label: '1', disabled: false},
-      {key: 'VK_2', label: '2', disabled: false},
-      {key: 'VK_3', label: '3', disabled: false},
-      {key: 'VK_4', label: '4', disabled: false},
-      {key: 'VK_5', label: '5', disabled: false},
-      {key: 'VK_6', label: '6', disabled: false},
-      {key: 'VK_7', label: '7', disabled: false},
-      {key: 'VK_8', label: '8', disabled: false},
-      {key: 'VK_9', label: '9', disabled: false},
-      {key: 'VK_RED', label: 'red', disabled: false},
-      {key: 'VK_YELLOW', label: 'yellow', disabled: false},
-      {key: 'VK_GREEN', label: 'green', disabled: false},
-      {key: 'VK_BLUE', label: 'blue', disabled: false},
-      {key: 'VK_BACK', label: 'back', disabled: false},
-      {key: 'VK_OK', label: 'ok', disabled: false}
-    ]
-  };
-}
+/**
+ * Quiz Component Specific Part
+ *
+ * The following code provides the possibility to create a Quiz Component for editors and contains the backend
+ * functionality. Following types are used:
+ *
+ * 1. Answers: used for storing answer options with their labels.
+ * 2. Questions: used for storing questions, as well as question related timestamps.
+ * 3: Quiz: central functionality, as well as questions and correct answers are stored here.
+ *
+ */
+
+
+/**
+ * Answers
+ */
 
 const answerType = Types.shape(
   {
@@ -83,38 +74,10 @@ const answerType = Types.shape(
     id: Types.string
   });
 
-
 function createDefaultAnswer() {
   return {
     label: '',
     id: generateId()
-  };
-}
-
-const questionType = Types.shape(
-  {
-    start_tms: Types.string,
-    guest_tms: Types.string,
-    end_tms: Types.bool,
-    start_error: Types.bool,
-    guest_error: Types.bool,
-    end_error: Types.bool,
-    id: Types.string,
-    label: Types.string,
-    correct_answer: Types.string
-  });
-
-function createDefaultQuestion() {
-  return {
-    start_tms: null,
-    guest_tms: null,
-    end_tms: null,
-    start_error: false,
-    guest_error: false,
-    end_error: false,
-    label: '',
-    id: generateId(),
-    correct_answer: ''
   };
 }
 
@@ -144,6 +107,38 @@ class Answer extends React.Component {
   }
 }
 
+/**
+ * Questions
+ *
+ **/
+
+const questionType = Types.shape(
+  {
+    start_tms: Types.string,
+    guest_tms: Types.string,
+    end_tms: Types.bool,
+    start_error: Types.bool,
+    guest_error: Types.bool,
+    end_error: Types.bool,
+    id: Types.string,
+    label: Types.string,
+    correct_answer: Types.string
+  });
+
+function createDefaultQuestion() {
+  return {
+    start_tms: null,
+    guest_tms: null,
+    end_tms: null,
+    start_error: false,
+    guest_error: false,
+    end_error: false,
+    label: '',
+    id: generateId(),
+    correct_answer: ''
+  };
+}
+
 class Question extends React.Component {
 
   static propTypes = {
@@ -161,6 +156,10 @@ class Question extends React.Component {
     autobind(this);
   }
 
+  /**
+   * Interface for collecting question related attributes like question title, start timestamp, end timestamp and
+   * correct answer
+   */
   render() {
     const options = [];
 
@@ -255,6 +254,7 @@ class Question extends React.Component {
               </td>
             </tr>
             <tr>
+              {/*Button to delete a specific question*/}
               <button
                 type="button"
                 onClick={() => this.props.deleteQuestion(this.props.id)}
@@ -283,22 +283,14 @@ class Question extends React.Component {
             </tr>
           </table>
         </div>
-        {/* <div className="list-add-element">*/}
-        {/* <span>*/}
-        {/* <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">*/}
-        {/* <path*/}
-        {/* d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"*/}
-        {/* />*/}
-        {/* <path*/}
-        {/* d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"*/}
-        {/* />*/}
-        {/* </svg>*/}
-        {/* </span>*/}
-        {/* </div>*/}
       </div>
     );
   }
 }
+
+/**
+ * Quiz - main component
+ */
 
 class Quiz extends React.Component {
 
@@ -326,16 +318,15 @@ class Quiz extends React.Component {
     });
   }
 
-
   setContent(itemId, key, value) {
     let {questions} = this.props;
     const idx = questions.findIndex(({id}) => id === itemId);
     questions = questions.concat();
     questions[idx][key] = value;
     this.props.changeAreaContent({questions});
-    console.log('hey')
   }
 
+  // Add a new a answer option
   addAnswer(e) {
     e.preventDefault();
     const {answers} = this.props;
@@ -343,7 +334,7 @@ class Quiz extends React.Component {
     this.props.changeAreaContent({answers});
   }
 
-
+  // Delete an answer option
   deleteAnswer() {
     let {answers} = this.props;
     answers = answers.concat();
@@ -359,7 +350,17 @@ class Quiz extends React.Component {
     });
   }
 
+  // Change label of an existing answer option
+  changeAnswerLabel(itemId, key, value) {
+    let {answers} = this.props;
+    const idx = answers.findIndex(({id}) => id === itemId);
+    answers = answers.concat();
+    answers[idx][key] = value;
+    this.props.changeAreaContent({answers});
+  }
 
+
+  // Check if an answer to be deleted has already been used. If so, warn user.
   checkIfAnswerWasUsedBefore(answer, callback) {
     let {questions} = this.props;
     questions = questions.concat();
@@ -380,6 +381,7 @@ class Quiz extends React.Component {
     callback(alarm);
   }
 
+  // Add a new question
   addQuestion(e) {
     e.preventDefault();
     const {questions} = this.props;
@@ -387,14 +389,14 @@ class Quiz extends React.Component {
     this.props.changeAreaContent({questions});
   }
 
-  changeAnswerLabel(itemId, key, value) {
-    let {answers} = this.props;
-    const idx = answers.findIndex(({id}) => id === itemId);
-    answers = answers.concat();
-    answers[idx][key] = value;
-    this.props.changeAreaContent({answers});
+  // Delete a question
+  deleteQuestion(itemId) {
+    let {questions} = this.props;
+    const idx = questions.findIndex(({id}) => id === itemId);
+    questions = questions.concat();
+    questions.splice(idx, 1);
+    this.props.changeAreaContent({questions});
   }
-
 
   handleChangeTimeStamp(itemId, name, e) {
     const changedTime = parseInt(e.target.value);
@@ -452,7 +454,7 @@ class Quiz extends React.Component {
     };
   }
 
-  //If I can find for the current timeStamp x any timeStamp inside the same question that collides with x, show an error
+  // If I can find for the current timeStamp x any timeStamp inside the same question that collides with x, show an error
   lookForWrongOrderInsideQuestion(itemId, name, currQuestion, changedTime) {
     const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
@@ -467,7 +469,7 @@ class Quiz extends React.Component {
     }
   }
 
-  //If I can find for the current timeStamp x any timeStamp in a previous question that is smaller than x, show an error
+  // If I can find for the current timeStamp x any timeStamp in a previous question that is smaller than x, show an error
   lookForBiggerStampsInPrevQuestions(itemId, currQuestion, prevQuestions, changedTime) {
     const {timeStart, timeGuest, timeEnd} = this.getStampsCurrQuestion(name, changedTime, currQuestion);
 
@@ -519,14 +521,9 @@ class Quiz extends React.Component {
     return {};
   }
 
-  deleteQuestion(itemId) {
-    let {questions} = this.props;
-    const idx = questions.findIndex(({id}) => id === itemId);
-    questions = questions.concat();
-    questions.splice(idx, 1);
-    this.props.changeAreaContent({questions});
-  }
-
+  /**
+   * Interface for collecting quiz related parameters, uses Question objects
+   */
   render() {
     return (
       <div className="component editHeader">
@@ -550,6 +547,7 @@ class Quiz extends React.Component {
           </tbody>
         </table>
         <div style={{marginTop: '10px'}}>
+          {/* Button to add a new answer */}
           <button
             type="button"
             onClick={e => this.addAnswer(e)}
@@ -557,6 +555,7 @@ class Quiz extends React.Component {
             style={{marginRight: '10px', marginBottom: '30px', float: 'right'}}
           >{i18n.answer_btn}
           </button>
+          {/* Button to delete last provided answer */}
           <button
             type="button"
             onClick={() => this.deleteAnswer()}
@@ -583,15 +582,18 @@ class Quiz extends React.Component {
             {i18n.delete_answer}
           </button>
           <div style={{marginTop: '20px', clear: 'both'}}>
+            {/* Button to add a new question */}
             <div className="list-add-element" onClick={e => this.addQuestion(e)}>
-            <span>
-              <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                <path
-                  d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"/>
-                <path
-                  d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"/>
-              </svg>
-            </span>
+              <span>
+                <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                  <path
+                    d="M50.49,22.85A28.25,28.25,0,1,0,78.74,51.1,28.29,28.29,0,0,0,50.49,22.85Zm0,52.94A24.69,24.69,0,1,1,75.17,51.1,24.71,24.71,0,0,1,50.49,75.79Z"
+                  />
+                  <path
+                    d="M64.47,49.31H52.27V37.12a1.78,1.78,0,1,0-3.57,0V49.31H36.51a1.78,1.78,0,0,0,0,3.57H48.7V65.08a1.78,1.78,0,0,0,3.57,0V52.88H64.47a1.78,1.78,0,0,0,0-3.57Z"
+                  />
+                </svg>
+              </span>
               <p>{i18n.add_question}</p>
             </div>
             {this.props.questions.map((item, i) => (

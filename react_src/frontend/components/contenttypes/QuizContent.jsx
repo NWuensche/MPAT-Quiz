@@ -1,30 +1,20 @@
 /**
  *
- * Copyright (c) 2019 MPAT Consortium , All rights
-reserved.
- * Fraunhofer FOKUS, Fincons Group, Telecom ParisTech, IRT,
-Lancaster University, Leadin, RBB, Mediaset
+ * Copyright (c) 2017 MPAT Consortium , All rights reserved.
+ * Fraunhofer FOKUS, Fincons Group, Telecom ParisTech, IRT, Lancaster University, Leadin, RBB, Mediaset
  *
- * This program is free software; you can redistribute it
-and/or
- * modify it under the terms of the GNU General Public
-License
- * as published by the Free Software Foundation; either
-version 2
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be
-useful,
- * but WITHOUT ANY WARRANTY; without even the implied
-warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser
-General Public
- * License along with this library. If not, see
-<http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  *
  * AUTHORS:
  * Carolin Stolpe
@@ -34,11 +24,8 @@ General Public
  **/
 
 import React from 'react';
-import autobind from 'class-autobind';
-
 import {createHandler, handlersWithTag} from '../../utils';
 import {registerHandlers, unregisterHandlers} from '../../RemoteBinding';
-import {trackAction} from '../../analytics';
 import {componentLoader} from '../../../ComponentLoader';
 
 
@@ -172,7 +159,7 @@ class QuizContent extends React.Component {
         <div className="quiz-score">
           <p>Frage {this.state.currQuestion + 1 }</p>
           <p style={{align: 'right'}}>Score: {this.state.score}</p>
-          {/*<p>Time: {this.state.playbackTime}</p>*/}
+          <p>Time: {this.state.playbackTime}</p>
         </div>
         <div>
           {answers.map((answer, i) => (
@@ -188,15 +175,6 @@ class QuizContent extends React.Component {
             />
           ))
           }
-          {/*entered: {this.state.enteredButton}*/
-          }
-          {/*correct: {this.state.correct}*/
-          }
-          {/*{*/}
-          {/*<OverText*/}
-          {/*lastQuestionOver={this.props.questions.length === this.state.currQuestion + 1 && this.state.timeEnterOver}*/}
-          {/*/>*/}
-          {/*}*/}
         </div>
       </div>
     );
@@ -217,15 +195,6 @@ function answeredBeforeGuests(lastStampIndex) {
   return false;
 }
 
-// Show hint that quiz is over when last question is over and time to Enter is also over
-function OverText({lastQuestionOver}) {
-  let text = "";
-  if (lastQuestionOver) {
-    text = "Quiz is Over!"
-  }
-  return ( <div>{text}</div>);
-}
-
 function QuizButton({item, isSelected = false, isEntered = false, dontSelect = false, isRight = false, enteredWrong = false, odd = false}) {
   let css = {
     border: '2px #fff solid'
@@ -244,30 +213,9 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
     css.border = '2px #fff solid';
   }
 
-  let marker;
-  if (odd) {
-    marker = 'wrapper odd';
-  } else {
-    marker = 'wrapper';
-  }
   return (
-      <button className="quiz-button" style={css}>{item.label}</button>
+    <button className="quiz-button" style={css}>{item.label}</button>
   );
-}
-
-class QuizScoreContent extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      score: 0
-    };
-  }
-
-  render() {
-    return (
-      <div>Score: {this.state.score}</div>
-    );
-  }
 }
 
 // Fix that -1 % 4 == -1 , newMod(-1,4) == 3
