@@ -251,9 +251,7 @@ function QuizButton({item, isSelected = false, isEntered = false, dontSelect = f
     marker = 'wrapper';
   }
   return (
-    <div className={marker}>
       <button className="quiz-button" style={css}>{item.label}</button>
-    </div>
   );
 }
 
