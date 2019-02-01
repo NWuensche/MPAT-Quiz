@@ -50,6 +50,8 @@ class QuizContent extends React.Component {
     // Register Key Handlers
     registerHandlers(this, handlersWithTag('active', [
       createHandler(KeyEvent.VK_UP, this.up.bind(this)),
+      createHandler(KeyEvent.VK_RIGHT, this.up.bind(this)),
+      createHandler(KeyEvent.VK_LEFT, this.down.bind(this)),
       // Add shortcuts to answer questions fast
       createHandler(KeyEvent.VK_1, this.shortcutEnter.bind(this, 0)),
       createHandler(KeyEvent.VK_2, this.shortcutEnter.bind(this, 1)),
