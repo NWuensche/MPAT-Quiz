@@ -70,6 +70,18 @@ class QuizContent extends React.Component {
     ));
     // Start Timer for Video
     setInterval(() => {
+      if(this.state.playbackTime == 2) {
+        this.setState(prevState => ({
+          ...prevState,
+          playbackTime: 13
+        }));
+      }
+      if(this.state.playbackTime == 22) {
+        this.setState(prevState => ({
+          ...prevState,
+          playbackTime: 6
+        }));
+      }
       this.setState(prevState => ({
         ...prevState,
         playbackTime: prevState.playbackTime + 1,
