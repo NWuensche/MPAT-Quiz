@@ -40,7 +40,7 @@ class QuizContent extends React.Component {
       score: 0,
       correct: -1,
       currQuestion: -1,
-      playbackTime: 0,
+      playbackTime: 15,
       timeStamps: [], // [Start1, Guest1, End1, Start2,...] of Questions in s
       lastStampIndex: -1, // e.g. 1 -> Between Guest1 and End1
     };
