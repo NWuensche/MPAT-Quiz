@@ -161,7 +161,6 @@ class QuizContent extends React.Component {
         <div className="quiz-score">
           <p>Frage {this.state.currQuestion + 1 }</p>
           <p style={{align: 'right'}}>Score: {this.state.score}</p>
-          <p>Time: {this.state.playbackTime}</p>
         </div>
         <div>
           {answers.map((answer, i) => (
