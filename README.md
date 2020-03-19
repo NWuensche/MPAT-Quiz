@@ -1,6 +1,8 @@
-MPAT main plugins + Quiz
+# MPAT main plugins + Quiz
 
-Install Guide:
+Based on work of the Fraunhofer "Multi-Platform Application Toolkit" - [https://www.github.com/MPAT-eu](https://www.github.com/MPAT-eu)
+
+## Install Guide
 
 * Install MPAT-Core
 * Replace app/plugin/mpat-plugins folder with this repo
